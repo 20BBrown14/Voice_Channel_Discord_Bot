@@ -200,4 +200,4 @@ async def on_message(message):
     else:
       await client.send_message('Sorry, you do not have permission to use this command. Please contact Nibikk if you have any questions.')
 
-client.run('MzM1NDQ1MzY5OTMwNTE0NDMz.DE_szQ.gI0tvnOIQcDyxt62WA3R9BDWV0s') #Add your own bot's token here
+client.run(TOKEN) #Add your own bot's token here
