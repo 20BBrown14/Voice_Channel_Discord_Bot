@@ -181,11 +181,4 @@ async def on_message(message):
   elif(message.content.startswith('/r/')):
     await reddit_link(message)
 
-#try: 
- # _thread.start_new_thread(member_change())
-#except:
-#  print("Error: Cannot start new thread")
-
-#pull test
-
-client.run('MzM1NDQ1MzY5OTMwNTE0NDMz.DE_szQ.gI0tvnOIQcDyxt62WA3R9BDWV0s') #Add your own bot's token here
+client.run('TOKEN') #Add your own bot's token here
