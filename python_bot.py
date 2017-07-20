@@ -128,6 +128,8 @@ async def help_command(message):
   < !status >: Replys indicating I am online\n
   < !voice [channel_id] >: Joins voice channel with specified Id (Special permissions required)\n
   < !ping >: Responds with your ping\n
+  < !stopvoice >: Disconnects the bot from the current voice channel (Special permissions required)\n
+  < !clean [amount] >: Removes all messages from the channel this command was invoked in that were sent by me or that were commands for the me (Special permissions required)\n
   My main purpose on this server is to announce when users leave or join the voice channel I am in.\n
   Nibikk is the creator of me, contact him if you have any questions.\n
   Last updated 07/20/2017\n""" #Change the text here to customize your help message.
@@ -139,6 +141,16 @@ async def stop_voice(message):
 
 async def reddit_link(message):
   await client.send_message(message.channel, "http://www.reddit.com"+message.content)
+
+async def clean_command(message):
+  channel = message.channel
+  options = [channel, 50000, delete_message, message, None, None]
+  await client.purge_from(channel, limit = 50000, check=lambda m: m.author.id == '335445369930514433' or m.content.startswith('!'))
+
+def delete_message(message):
+  return False
+  #if(message.author.id == '335445369930514433' or message.content.startswith('!')):
+   # return True
 
 @client.event
 async def on_ready():
@@ -153,6 +165,7 @@ async def on_ready():
       textToWav("Has joined the channel", "VoiceFiles/joined.wav")
     if( not (Path("VoiceFiles/left.wav").is_file())):
       textToWav("Has left the channel", "VoiceFiles/left.wav")
+    print(len(client.messages))
 
 @client.event
 async def on_message(message):
@@ -177,8 +190,14 @@ async def on_message(message):
   elif(message.content.startswith('!ping')):
     await ping_command(message)
   elif(message.content.startswith('!stopvoice')):
-    await stop_voice(message)
+    if(message.author.id == '159785058381725696' or message.author.id == '328175857707253760'):
+      await stop_voice(message)
   elif(message.content.startswith('/r/')):
     await reddit_link(message)
+  elif(message.content.startswith('!clean')):
+    if(message.author.id == '159785058381725696' or message.author.id == '328175857707253760'):
+      await clean_command(message)
+    else:
+      await client.send_message('Sorry, you do not have permission to use this command. Please contact Nibikk if you have any questions.')
 
 client.run('TOKEN') #Add your own bot's token here
