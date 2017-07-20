@@ -181,4 +181,4 @@ async def on_message(message):
   elif(message.content.startswith('/r/')):
     await reddit_link(message)
 
-client.run('TOKEN') #Add your own bot's token here
+client.run(TOKEN) #Add your own bot's token here
