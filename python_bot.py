@@ -1,9 +1,12 @@
-import discord #You'll need to install this
+#import discord #You'll need to install this
+from discord import Client
 import random
 import time
 import subprocess #You'll need to install this and also download espeak and put in the same directory as this source code.
 import threading
 import os
+import urllib.request
+import json
 from pathlib import Path
 from datetime import datetime
 from datetime import datetime,timedelta
@@ -14,7 +17,7 @@ global voice_client
 global voice_channel
 global old_voice_members
 
-client = discord.Client()
+client = Client()
 
 def member_change():
   global old_voice_members
@@ -57,7 +60,6 @@ def member_change():
             while(not player.is_done()):
               waitCount = 0
           break
-      print("made it here")
     elif(len(voice_channel.voice_members) > len(old_voice_members)):
       print("Someone joined")
       for i in range(0, len(voice_channel.voice_members)):
@@ -101,6 +103,22 @@ def textToWav(text, file_name):
   subprocess.call(["espeak", "-vf2", "-w"+file_name, text]) #Change (or remove) "f2" to a voice file in ~/espeak/espeak-data/voice to change the voice
   print("File written")
 
+async def giphy_command(message):
+  forbidden_gifs = ['/gamerescape', '/xivdb', '/giphy', '/tts', '/tenor', '/me', '/tableflip', '/unflip', '/shrug', '/nick']
+  spaceIndex = message.content.find(' ')
+  if message.content[:spaceIndex] in forbidden_gifs:
+    return
+  search_params = message.content[1:]
+  search_params_sb = ""
+  first = True
+  for i in range(0,len(search_params)):
+    if search_params[i] == ' ':
+      search_params_sb = search_params_sb + search_params[len(search_params_sb):i] + '+'
+  search_params_sb = search_params_sb + search_params[len(search_params_sb):]
+  data = json.loads(urllib.request.urlopen('http://api.giphy.com/v1/gifs/search?q='+search_params_sb+'&api_key=API_KEY_HERE&limit=100').read()) #Add your own giphy API here key
+  url = json.dumps(data["data"][random.randint(0,100)]["url"], sort_keys = True, indent = 4)
+  await client.send_message(message.channel, url[1:len(url)-1])
+
 async def join_voice(channel_id):
   global player
   global voice_client
@@ -108,7 +126,7 @@ async def join_voice(channel_id):
   global old_voice_members
   voice_channel = client.get_channel(channel_id)
   voice = await client.join_voice_channel(voice_channel)
-  player = voice.create_ffmpeg_player('hello.wav')
+  player = voice.create_ffmpeg_player('VoiceFiles/init.wav')
   print("about to start playing")
   voice_client = voice
   old_voice_members = []
@@ -123,14 +141,18 @@ async def ping_command(message):
 
 async def help_command(message):
   channel = message.channel
-  help_message = """Here are list of available commands:\n
-  < !help >: Displays a list of available commands\n
-  < !status >: Replys indicating I am online\n
-  < !voice [channel_id] >: Joins voice channel with specified Id (Special permissions required)\n
-  < !ping >: Responds with your ping\n
-  My main purpose on this server is to announce when users leave or join the voice channel I am in.\n
-  Nibikk is the creator of me, contact him if you have any questions.\n
-  Last updated 07/20/2017\n""" #Change the text here to customize your help message.
+  help_message = """Here are list of available commands:
+  < !help >: *Displays a list of available commands*
+  < !status >: *Replys indicating I am online*
+  < !voice [channel_id] >: *Joins voice channel with specified Id (Special permissions required)*
+  < !ping >: *Responds with your ping*
+  < !stopvoice >: *Disconnects the bot from the current voice channel (Special permissions required)*
+  < !clean [amount] >: *Removes all messages from the channel this command was invoked in that were sent by me or that were commands for the me (Special permissions required)*
+  < !pizza >: *Just do it*
+  < /[emote] >: Invoking a slash command will make me search for a relevant gif and then post it
+  My main purpose on this server is to announce when users leave or join the voice channel I am in.
+  Nibikk is the creator of me, contact him if you have any questions.
+  Last updated 07/21/2017""" #Change the text here to customize your help message.
   await client.send_message(channel, help_message)
 
 async def stop_voice(message):
@@ -139,6 +161,16 @@ async def stop_voice(message):
 
 async def reddit_link(message):
   await client.send_message(message.channel, "http://www.reddit.com"+message.content)
+
+async def clean_command(message):
+  channel = message.channel
+  options = [channel, 50000, delete_message, message, None, None]
+  await client.purge_from(channel, limit = 50000, check=lambda m: m.author.id == '335445369930514433' or m.content.startswith('!'))
+
+def delete_message(message):
+  return False
+  #if(message.author.id == '335445369930514433' or message.content.startswith('!')):
+   # return True
 
 @client.event
 async def on_ready():
@@ -153,6 +185,9 @@ async def on_ready():
       textToWav("Has joined the channel", "VoiceFiles/joined.wav")
     if( not (Path("VoiceFiles/left.wav").is_file())):
       textToWav("Has left the channel", "VoiceFiles/left.wav")
+    if( not (Path("VoiceFiles/init.wav").is_file())):
+      textToWav("init", "VoiceFiles/init.wav")
+    print(len(client.messages))
 
 @client.event
 async def on_message(message):
@@ -177,8 +212,21 @@ async def on_message(message):
   elif(message.content.startswith('!ping')):
     await ping_command(message)
   elif(message.content.startswith('!stopvoice')):
-    await stop_voice(message)
+    if(message.author.id == '159785058381725696' or message.author.id == '328175857707253760'):
+      await stop_voice(message)
   elif(message.content.startswith('/r/')):
     await reddit_link(message)
+  elif(message.content.startswith('!clean')):
+    if(message.author.id == '159785058381725696' or message.author.id == '328175857707253760'):
+      await clean_command(message)
+    else:
+      await client.send_message('Sorry, you do not have permission to use this command. Please contact Nibikk if you have any questions.')
+  elif(message.content.startswith('!pizza')):
+    await client.send_message(message.channel, 'Pizza? Who\'s paying for this? Not me.)
+  elif(message.content.startswith('!Mugglewump')):
+    if(message.author.id == '159785058381725696' or message.author.id == '83809782691004416'):
+      await client.send_message(message.channel, '<@328175857707253760> is a dope Templar!')
+  elif(message.content.startswith('/')):
+    await giphy_command(message)
 
 client.run(TOKEN) #Add your own bot's token here
