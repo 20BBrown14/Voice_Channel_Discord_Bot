@@ -176,12 +176,4 @@ async def on_message(message):
   elif(message.content.startswith('!stopvoice')):
     await stop_voice(message)
 
-#try: 
- # _thread.start_new_thread(member_change())
-#except:
-#  print("Error: Cannot start new thread")
-
-#pull test again
-
-
 client.run(TOKEN) #Add your own bot's token here
