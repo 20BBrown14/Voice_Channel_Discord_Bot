@@ -137,6 +137,9 @@ async def stop_voice(message):
   global voice_client
   await voice_client.disconnect()
 
+async def reddit_link(message):
+  await client.send_message(message.channel, "http://www.reddit.com"+message.content)
+
 @client.event
 async def on_ready():
     #info
@@ -175,5 +178,7 @@ async def on_message(message):
     await ping_command(message)
   elif(message.content.startswith('!stopvoice')):
     await stop_voice(message)
+  elif(message.content.startswith('/r/')):
+    await reddit_link(message)
 
 client.run(TOKEN) #Add your own bot's token here
