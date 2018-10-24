@@ -14,17 +14,25 @@ Follow instructions on how to install python for your operating system
 
 ### Windows
 Win + R
+
 type 'cmd'
+
 hit enter
+
 cd into the directory with python_bot.py
-`[Path to python.exe] python_bot.py`
+
+run `[Path to python.exe] python_bot.py`
 
 ### Mac
 Command + Space
+
 type 'terminal'
+
 hit enter
+
 cd into the directory with python_bot.pt
-`python python_bot.py`
+
+run `python python_bot.py`
 
 ## Notes
 You will have to keep the terminal/cmd window running while you want the bot running. This bot will not run if your computer is asleep, hibernating, or turned off. You will need to host it on a seperate server with a 100% uptime. It is possible to set the bot to turn on when you turn your computer on. You'll have to look up that information yourself.
