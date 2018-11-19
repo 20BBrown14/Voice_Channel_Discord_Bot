@@ -1,4 +1,5 @@
-import discord #You'll need to install this
+#import discord #You'll need to install this
+from discord import Client
 import random
 import time
 import subprocess #You'll need to install this and also download espeak and put in the same directory as this source code.
@@ -16,7 +17,7 @@ global voice_client
 global voice_channel
 global old_voice_members
 
-client = discord.Client()
+client = Client()
 
 def member_change():
   global old_voice_members
@@ -59,7 +60,6 @@ def member_change():
             while(not player.is_done()):
               waitCount = 0
           break
-      print("made it here")
     elif(len(voice_channel.voice_members) > len(old_voice_members)):
       print("Someone joined")
       for i in range(0, len(voice_channel.voice_members)):
@@ -222,7 +222,7 @@ async def on_message(message):
     else:
       await client.send_message('Sorry, you do not have permission to use this command. Please contact Nibikk if you have any questions.')
   elif(message.content.startswith('!pizza')):
-    await client.send_message(message.channel, 'The fuck you think I am? Think I can order you pizza? Who\'s paying for this shit?')
+    await client.send_message(message.channel, 'Pizza? Who\'s paying for this? Not me.)
   elif(message.content.startswith('!Mugglewump')):
     if(message.author.id == '159785058381725696' or message.author.id == '83809782691004416'):
       await client.send_message(message.channel, '<@328175857707253760> is a dope Templar!')

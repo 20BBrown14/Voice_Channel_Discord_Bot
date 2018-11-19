@@ -10,7 +10,7 @@ Follow the discord provided instructions on how to setup a bot on your discord s
 
 Follow instructions on how to install discord.py for your operating system
 
-Follow instructions on how to install python 3.5.x for your operating system
+Follow instructions on how to install python for your operating system
 
 ### Windows
 Win + R
