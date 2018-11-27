@@ -1,5 +1,6 @@
 #import discord #You'll need to install this
 from discord import Client
+import discord
 import random
 import time
 import subprocess #You'll need to install this and also download espeak and put in the same directory as this source code.
@@ -10,6 +11,8 @@ import json
 from pathlib import Path
 from datetime import datetime
 from datetime import datetime,timedelta
+import csv
+from collections import OrderedDict
 #from dateutil.parser import parse
 
 global player
@@ -115,15 +118,21 @@ async def giphy_command(message):
     if search_params[i] == ' ':
       search_params_sb = search_params_sb + search_params[len(search_params_sb):i] + '+'
   search_params_sb = search_params_sb + search_params[len(search_params_sb):]
-  data = json.loads(urllib.request.urlopen('http://api.giphy.com/v1/gifs/search?q='+search_params_sb+'&api_key=API_KEY_HERE&limit=100').read()) #Add your own giphy API here key
-  url = json.dumps(data["data"][random.randint(0,100)]["url"], sort_keys = True, indent = 4)
-  await client.send_message(message.channel, url[1:len(url)-1])
+  data = json.loads(urllib.request.urlopen('http://api.giphy.com/v1/gifs/search?q='+search_params_sb+'&api_key=').read()) #Add your own giphy API here key
+  url = json.dumps(data["data"][random.randint(0,len(data["data"]))]["url"], sort_keys = True, indent = 4)
+  await client.send_message(message.channel, url[1:len(url)-1] + ' \'' + message.content[1:] + '\' by ' + message.author.nick + ' with ' + str(len(data["data"])) + ' results')
+  await client.delete_message(message)
 
 async def join_voice(channel_id):
   global player
   global voice_client
   global voice_channel
   global old_voice_members
+  if not discord.opus.is_loaded():
+    print("Not loaded!")
+    discord.opus.load_opus("opuslib")
+  else:
+    print("Loaded apparently?")
   voice_channel = client.get_channel(channel_id)
   voice = await client.join_voice_channel(voice_channel)
   player = voice.create_ffmpeg_player('VoiceFiles/init.wav')
@@ -147,13 +156,17 @@ async def help_command(message):
   < !voice [channel_id] >: *Joins voice channel with specified Id (Special permissions required)*
   < !ping >: *Responds with your ping*
   < !stopvoice >: *Disconnects the bot from the current voice channel (Special permissions required)*
-  < !clean [amount] >: *Removes all messages from the channel this command was invoked in that were sent by me or that were commands for the me (Special permissions required)*
+  < !clean [amount] >: *Removes all messages from the channel this command was invoked in that were sent by me or that were commands for the me*
   < !pizza >: *Just do it*
+  < !downvote @user >: Downvotes a user and keeps track
+  < !upvote @user >: Upvotes a user and keeps track
+  < !votes >: Displays all votes
   < /[emote] >: Invoking a slash command will make me search for a relevant gif and then post it
   My main purpose on this server is to announce when users leave or join the voice channel I am in.
   Nibikk is the creator of me, contact him if you have any questions.
-  Last updated 07/21/2017""" #Change the text here to customize your help message.
+  Last updated 11/27/2018""" #Change the text here to customize your help message.
   await client.send_message(channel, help_message)
+  await client.delete_message(message)
 
 async def stop_voice(message):
   global voice_client
@@ -161,6 +174,7 @@ async def stop_voice(message):
 
 async def reddit_link(message):
   await client.send_message(message.channel, "http://www.reddit.com"+message.content)
+  await client.delete_message(message)
 
 async def clean_command(message):
   channel = message.channel
@@ -171,6 +185,58 @@ def delete_message(message):
   return False
   #if(message.author.id == '335445369930514433' or message.content.startswith('!')):
    # return True
+
+async def vote_command(message, vote):
+  content = ''
+  if(vote != 'display' and vote == 'down'):
+    content = message.content[10:]
+  elif(vote != 'display' and vote == 'up'):
+    content = message.content[8:]
+  votesFile = ''
+  rows = []
+  foundName = False
+  displayString = 'Name, Upvotes, Downvotes, Net score\n'
+  if (not content.startswith('<@!') or not content.endswith('>')) and vote != 'display':
+    return 0
+  if not (Path('votes.csv').is_file()):
+    votesFile = open('votes.csv', "x")
+    votesFile.write("name,upvotes,downvotes,net")
+    votesFile.close()
+  with open('votes.csv', mode='r') as csv_file:
+    csv_reader = csv.DictReader(csv_file)
+    line_count = 0
+    for row in csv_reader:
+      if(vote == 'display'):
+        foundName = True
+        newStringLine = row['name']+': '+row['upvotes'] + ", " + row['downvotes'] + ", " + row['net']
+        displayString = displayString + newStringLine + "\n"
+      elif row['name'] == content:
+        foundName = True
+        if(vote == 'down'):
+          row['downvotes'] = str(int(row['downvotes']) - 1)
+          row['net'] = str(int(row['net']) - 1)
+        elif(vote == 'up'):
+          print("changing it up")
+          row['upvotes'] = str(int(row['upvotes']) + 1)
+          row['net'] = str(int(row['net']) + 1)
+      rows.append(row)
+    if not foundName:
+      if(vote == 'down'):
+        newRow = OrderedDict([('name', content), ('upvotes', '0'), ('downvotes', '-1'), ('net', '-1')])
+      elif(vote == 'up'):
+        newRow = OrderedDict([('name', content), ('upvotes', '1'), ('downvotes', '0'), ('net', '1')])
+      rows.append(newRow)
+  with open('votes.csv', mode='w') as csv_file:
+    fieldnames=['name','upvotes','downvotes','net']
+    writer = csv.DictWriter(csv_file, fieldnames=fieldnames)
+
+    writer.writeheader()
+    for row in rows:
+      writer.writerow(row)
+  #await client.send_message(message.channel, displayString)
+  if(vote == 'display'):
+    await client.send_message(message.channel, displayString)
+    await client.delete_message(message)
 
 @client.event
 async def on_ready():
@@ -217,16 +283,19 @@ async def on_message(message):
   elif(message.content.startswith('/r/')):
     await reddit_link(message)
   elif(message.content.startswith('!clean')):
-    if(message.author.id == '159785058381725696' or message.author.id == '328175857707253760'):
-      await clean_command(message)
-    else:
-      await client.send_message('Sorry, you do not have permission to use this command. Please contact Nibikk if you have any questions.')
+    await clean_command(message)
   elif(message.content.startswith('!pizza')):
-    await client.send_message(message.channel, 'Pizza? Who\'s paying for this? Not me.)
+    await client.send_message(message.channel, 'Pizza? Who\'s paying for this? Not me.')
   elif(message.content.startswith('!Mugglewump')):
     if(message.author.id == '159785058381725696' or message.author.id == '83809782691004416'):
       await client.send_message(message.channel, '<@328175857707253760> is a dope Templar!')
+  elif(message.content.startswith('!downvote')):
+    await vote_command(message, 'down')
+  elif(message.content.startswith('!upvote')):
+    await vote_command(message, 'up')
+  elif(message.content.startswith('!votes')):
+    await vote_command(message, 'display')
   elif(message.content.startswith('/')):
     await giphy_command(message)
 
-client.run(TOKEN) #Add your own bot's token here
+client.run("") #Add your own bot's token here
