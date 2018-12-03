@@ -11,8 +11,11 @@ import json
 from pathlib import Path
 from datetime import datetime
 from datetime import datetime,timedelta
+import datetime
 import csv
 from collections import OrderedDict
+from discord.utils import get
+from dateutil.relativedelta import relativedelta
 #from dateutil.parser import parse
 
 global player
@@ -118,7 +121,7 @@ async def giphy_command(message):
     if search_params[i] == ' ':
       search_params_sb = search_params_sb + search_params[len(search_params_sb):i] + '+'
   search_params_sb = search_params_sb + search_params[len(search_params_sb):]
-  data = json.loads(urllib.request.urlopen('http://api.giphy.com/v1/gifs/search?q='+search_params_sb+'&api_key=').read()) #Add your own giphy API here key
+  data = json.loads(urllib.request.urlopen('http://api.giphy.com/v1/gifs/search?q='+search_params_sb+'&api_key=&limit=100').read()) #Add your own giphy API here key
   url = json.dumps(data["data"][random.randint(0,len(data["data"]))]["url"], sort_keys = True, indent = 4)
   await client.send_message(message.channel, url[1:len(url)-1] + ' \'' + message.content[1:] + '\' by ' + message.author.nick + ' with ' + str(len(data["data"])) + ' results')
   await client.delete_message(message)
@@ -161,6 +164,7 @@ async def help_command(message):
   < !downvote @user >: Downvotes a user and keeps track
   < !upvote @user >: Upvotes a user and keeps track
   < !votes >: Displays all votes
+  < !lunchtime >: If it's 11:30AM it's lunch time!
   < /[emote] >: Invoking a slash command will make me search for a relevant gif and then post it
   My main purpose on this server is to announce when users leave or join the voice channel I am in.
   Nibikk is the creator of me, contact him if you have any questions.
@@ -196,7 +200,7 @@ async def vote_command(message, vote):
   rows = []
   foundName = False
   displayString = 'Name, Upvotes, Downvotes, Net score\n'
-  if (not content.startswith('<@!') or not content.endswith('>')) and vote != 'display':
+  if (not content.startswith('<@') or not content.endswith('>')) and vote != 'display':
     return 0
   if not (Path('votes.csv').is_file()):
     votesFile = open('votes.csv', "x")
@@ -238,6 +242,50 @@ async def vote_command(message, vote):
     await client.send_message(message.channel, displayString)
     await client.delete_message(message)
 
+async def mark_command(message):
+  today = datetime.date.today()
+  rd = relativedelta(today, datetime.date(2019,2,18))
+  reply = "Mark's first day at Cerner is in "
+  rd.years = rd.years * -1
+  rd.months = rd.months * -1
+  rd.days = rd.days * -1
+  if(rd.years > 0):
+    reply = reply + "%(years)d years " % rd.__dict__
+  if(rd.months > 0 and rd.years > 0 and rd.days > 0):
+    reply = reply + "and %(months)d months and %(days)d days" % rd.__dict__
+  elif(rd.months > 0 and rd.years > 0 and not rd.days > 0):
+    reply = reply +"and %(months)d months" % rd.__dict__
+  elif(rd.months > 0 and not rd.years > 0 and rd.days > 0):
+    reply = reply + "%(months)d months and %(days)d days" % rd.__dict__
+  elif(rd.months > 0 and not rd.years > 0 and not rd.days > 0):
+    reply = reply + "%(months)d months" % rd.__dict__
+  await client.send_message(message.channel, reply)
+  await client.delete_message(message)
+
+async def pre_add_reaction(message):
+  users = { 'Branden': '<@!159785058381725696>', 'Harold': '<@!451156129830141975>', 'Grant': '<@!314454492756180994>', 'Kevin': '<@!122149736659681282>'}
+  if(users['Branden'] in message.content):
+    emoji = get(client.get_all_emojis(), name='Branden')
+    await client.add_reaction(message, emoji)
+  if(users['Harold'] in message.content):
+    emoji = get(client.get_all_emojis(), name='Harold')
+    await client.add_reaction(message, emoji)
+  if(users['Grant'] in message.content):
+    emoji = get(client.get_all_emojis(), name='Grant')
+    await client.add_reaction(message, emoji)
+  if(users['Kevin'] in message.content):
+    emoji = get(client.get_all_emojis(), name='Kevin')
+    await client.add_reaction(message, emoji)
+  
+async def lunch_command(message):
+  now = datetime.now()
+  if(now.hour == 11 and now.minute == 30):
+    await client.send_message(message.channel, 'You bet! It\'s lunch time!')
+  elif(now.hour >= 11 and now.minute > 30):
+    await client.send_message(message.channel, 'You\'ve already had lunch today. Calm down.')
+  else:
+    await client.send_message(message.channel, 'Not lunch time yet. It\'s only '+ str(now.hour) +':' + str(now.minute))
+  
 @client.event
 async def on_ready():
     #info
@@ -259,6 +307,7 @@ async def on_ready():
 async def on_message(message):
   if(message.author != client.user):
     print(message.author.name + " said: \"" + message.content + "\" in #" + message.channel.name + " @ " + time.ctime())
+  await pre_add_reaction(message)
   if(message.content.startswith('!voice')):
     if(message.author.id == '159785058381725696' or message.author.id == '328175857707253760' or message.author.id == '314840626820677643' or message.author.id == '209415024354000897'): #These are user IDs and the logic only allows the players with this user ID to use this command
       if(len(message.content) < len('!voice ')):
@@ -295,6 +344,10 @@ async def on_message(message):
     await vote_command(message, 'up')
   elif(message.content.startswith('!votes')):
     await vote_command(message, 'display')
+  elif(message.content == '!lunchtime'):
+    await lunch_command(message)
+  elif(message.content.startswith('!Mark')):
+    await mark_command(message)
   elif(message.content.startswith('/')):
     await giphy_command(message)
 
