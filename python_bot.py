@@ -16,12 +16,19 @@ import csv
 from collections import OrderedDict
 from discord.utils import get
 from dateutil.relativedelta import relativedelta
+import calendar
+from threading import Timer
 #from dateutil.parser import parse
 
 global player
 global voice_client
 global voice_channel
 global old_voice_members
+global timecard_hour
+global lunch_hour
+global lunch_minute
+global foos_time
+global mess_with_kevin
 
 client = Client()
 
@@ -109,12 +116,15 @@ def textToWav(text, file_name):
   subprocess.call(["espeak", "-vf2", "-w"+file_name, text]) #Change (or remove) "f2" to a voice file in ~/espeak/espeak-data/voice to change the voice
   print("File written")
 
-async def giphy_command(message):
+async def giphy_command(messageContent, author, message):
   forbidden_gifs = ['/gamerescape', '/xivdb', '/giphy', '/tts', '/tenor', '/me', '/tableflip', '/unflip', '/shrug', '/nick']
-  spaceIndex = message.content.find(' ')
-  if message.content[:spaceIndex] in forbidden_gifs:
+  spaceIndex = messageContent.find(' ')
+  if spaceIndex != -1 and messageContent[:spaceIndex] in forbidden_gifs:
     return
-  search_params = message.content[1:]
+  elif spaceIndex == -1 and messageContent in forbidden_gifs:
+    print("Returning due to forbidden gif search")
+    return
+  search_params = messageContent[1:]
   search_params_sb = ""
   first = True
   for i in range(0,len(search_params)):
@@ -122,9 +132,18 @@ async def giphy_command(message):
       search_params_sb = search_params_sb + search_params[len(search_params_sb):i] + '+'
   search_params_sb = search_params_sb + search_params[len(search_params_sb):]
   data = json.loads(urllib.request.urlopen('http://api.giphy.com/v1/gifs/search?q='+search_params_sb+'&api_key=&limit=100').read()) #Add your own giphy API here key
-  url = json.dumps(data["data"][random.randint(0,len(data["data"]))]["url"], sort_keys = True, indent = 4)
-  await client.send_message(message.channel, url[1:len(url)-1] + ' \'' + message.content[1:] + '\' by ' + message.author.nick + ' with ' + str(len(data["data"])) + ' results')
-  await client.delete_message(message)
+  if(len(data["data"]) <= 0 ):
+    await client.send_message(author, "Sorry, but '"+messageContent[1:] + "' returned no results from Giphy.")
+  else:
+    url = json.dumps(data["data"][random.randint(0,len(data["data"])-1)]["url"], sort_keys = True, indent = 4)
+    displayName = ''
+    if(hasattr(author, 'nick')):
+      displayName = author.nick
+    else:
+      displayName = author.name
+    await client.send_message(message.channel, url[1:len(url)-1] + ' \'' + messageContent[1:] + '\' by ' + displayName + ' with ' + str(len(data["data"])) + ' results')
+  if(message and message.channel.name):
+    await client.delete_message(message)
 
 async def join_voice(channel_id):
   global player
@@ -147,7 +166,7 @@ async def join_voice(channel_id):
   member_change()
 
 async def ping_command(message):
-  d = datetime.utcnow() - message.timestamp
+  d = datetime.datetime.utcnow() - message.timestamp
   s = d.seconds*1000 + d.microseconds//1000
   await client.send_message(message.channel, "Ping: {}ms".format(s))
 
@@ -181,9 +200,15 @@ async def reddit_link(message):
   await client.delete_message(message)
 
 async def clean_command(message):
+  await client.delete_message(message)
+  amount = message.content[7:]
+  try:
+    amount = int(amount)
+  except:
+    amount = 5
   channel = message.channel
   options = [channel, 50000, delete_message, message, None, None]
-  await client.purge_from(channel, limit = 50000, check=lambda m: m.author.id == '335445369930514433' or m.content.startswith('!'))
+  await client.purge_from(channel, limit = amount, check=lambda m: m.author.id == '335445369930514433' or m.content.startswith('!'))
 
 def delete_message(message):
   return False
@@ -216,18 +241,20 @@ async def vote_command(message, vote):
         displayString = displayString + newStringLine + "\n"
       elif row['name'] == content:
         foundName = True
-        if(vote == 'down'):
+        if(vote == 'down' and row['name'] != message.author.mention):
           row['downvotes'] = str(int(row['downvotes']) - 1)
           row['net'] = str(int(row['net']) - 1)
-        elif(vote == 'up'):
-          print("changing it up")
+        elif(vote == 'up' and row['name'] != message.author.mention):
           row['upvotes'] = str(int(row['upvotes']) + 1)
           row['net'] = str(int(row['net']) + 1)
+        else:
+          await client.send_message(message.author, "Stop trying to " + vote + "vote yourself you goddamn hooligan!")
+          print("Someone tried to upvote themselves")
       rows.append(row)
     if not foundName:
-      if(vote == 'down'):
+      if(vote == 'down' and row['name'] != message.author.mention):
         newRow = OrderedDict([('name', content), ('upvotes', '0'), ('downvotes', '-1'), ('net', '-1')])
-      elif(vote == 'up'):
+      elif(vote == 'up' and row['name'] != message.author.mention):
         newRow = OrderedDict([('name', content), ('upvotes', '1'), ('downvotes', '0'), ('net', '1')])
       rows.append(newRow)
   with open('votes.csv', mode='w') as csv_file:
@@ -237,28 +264,46 @@ async def vote_command(message, vote):
     writer.writeheader()
     for row in rows:
       writer.writerow(row)
+  if(message.content == '!upvote <@!335445369930514433>'):
+    thankList = ["🇹", "🇭", "🇦", "🇳", "🇰"]
+    youList = ["🇾", "🇴", "🇺"]
+    for emoji in thankList:
+      await client.add_reaction(message, emoji)
+    await client.add_reaction(message, "⬛")
+    for emoji in youList:
+      await client.add_reaction(message, emoji)
+  elif(message.content == '!downvote <@!335445369930514433>'):
+    thankList = ["🇸", "🇨", "🇷", "🇪", "🇼"]
+    youList = ["🇾", "🇴", "🇺"]
+    for emoji in thankList:
+      await client.add_reaction(message, emoji)
+    await client.add_reaction(message,  "⬛")
+    for emoji in youList:
+      await client.add_reaction(message, emoji)
   #await client.send_message(message.channel, displayString)
   if(vote == 'display'):
     await client.send_message(message.channel, displayString)
     await client.delete_message(message)
 
+
 async def mark_command(message):
-  today = datetime.date.today()
-  rd = relativedelta(today, datetime.date(2019,2,18))
-  reply = "Mark's first day at Cerner is in "
-  rd.years = rd.years * -1
-  rd.months = rd.months * -1
-  rd.days = rd.days * -1
-  if(rd.years > 0):
-    reply = reply + "%(years)d years " % rd.__dict__
-  if(rd.months > 0 and rd.years > 0 and rd.days > 0):
-    reply = reply + "and %(months)d months and %(days)d days" % rd.__dict__
-  elif(rd.months > 0 and rd.years > 0 and not rd.days > 0):
-    reply = reply +"and %(months)d months" % rd.__dict__
-  elif(rd.months > 0 and not rd.years > 0 and rd.days > 0):
-    reply = reply + "%(months)d months and %(days)d days" % rd.__dict__
-  elif(rd.months > 0 and not rd.years > 0 and not rd.days > 0):
-    reply = reply + "%(months)d months" % rd.__dict__
+  now = datetime.datetime.now()
+  then = datetime.datetime(2019,2,18,8,30,0)
+  timeString = str(then-now)
+  timeDelta = (then-now)
+  reply = ''
+  FORMATCASE = "ALL"
+  months, days = divmod(timeDelta.days, 31)
+  hours, remainder = divmod(timeDelta.seconds, 3600)
+  minutes, seconds = divmod(remainder, 60)
+  if(months and days):
+    reply = "There are %d months, %d days, %d hours, %d minutes, and %d seconds until Mark gets rekt at foosball" % (months, days, hours, minutes, seconds)
+  elif(months and not days):
+    reply = "There are %d months, %d hours, %d minutes, and %d seconds until Mark gets rekt at foosball" % (months, hours, minutes, seconds)
+  elif(not months and days):
+    reply = "There are %d days, %d hours, %d minutes, and %d seconds until Mark gets rekt at foosball" % (days, hours, minutes, seconds)
+  elif(not months and not days):
+    reply = "There are  %d hours, %d minutes, and %d seconds until Mark gets rekt at foosball" % (hours, minutes, seconds)
   await client.send_message(message.channel, reply)
   await client.delete_message(message)
 
@@ -276,19 +321,165 @@ async def pre_add_reaction(message):
   if(users['Kevin'] in message.content):
     emoji = get(client.get_all_emojis(), name='Kevin')
     await client.add_reaction(message, emoji)
+  if('Mark' in message.content):
+    emoji = get(client.get_all_emojis(), name='Mark')
+    await client.add_reaction(message, emoji)
   
 async def lunch_command(message):
-  now = datetime.now()
-  if(now.hour == 11 and now.minute == 30):
+  global lunch_hour
+  global lunch_minute
+  gifSearches = ['/excited', '/hell yes', '/I\'m ready', '/Let\'s do this', '/Leggo', '/Lunch time']
+  now = datetime.datetime.now()
+  lunch_time = datetime.datetime(now.year, now.month, now.day, lunch_hour, lunch_minute)
+  tdelta = lunch_time - now
+  delta_seconds = tdelta.seconds
+  if(now.hour == lunch_hour and now.minute == lunch_minute):
     await client.send_message(message.channel, 'You bet! It\'s lunch time!')
-  elif(now.hour >= 11 and now.minute > 30):
+  elif(0 > tdelta.days):
     await client.send_message(message.channel, 'You\'ve already had lunch today. Calm down.')
+  elif(now.hour == lunch_hour):
+    if(10 * 60 > delta_seconds):
+      await client.send_message(message.channel, 'Almost lunch time. I\'m so excited. Are you excited?')
+      randomInt = random.randint(0, len(gifSearches)-1)
+      await client.send_message(message.channel, gifSearches[randomInt])
+    elif(30 * 60 > delta_seconds):
+      await client.send_message(message.channel, 'Almost there! Less than thirty minutes.')
   else:
-    await client.send_message(message.channel, 'Not lunch time yet. It\'s only '+ str(now.hour) +':' + str(now.minute))
+    minutes = str(now.minute)
+    if( len(str(now.minute)) == 1 ):
+      minutes = "0" + str(now.minute)
+    await client.send_message(message.channel, 'Not lunch time yet. Lunch is at ' + datetime.datetime(now.year, now.month, now.day, lunch_hour, lunch_minute).strftime("%H:%M"))
+  await client.delete_message(message)
+
+async def friday_command(message):
+  weekday = datetime.datetime.today().weekday()
+  calendarList = list(calendar.day_name)
+
+  if(calendarList[weekday] != 'Friday'):
+    await client.send_message(message.channel if message.channel.name else message.author, "Lol sucks you to be sucka, It\'s only " + calendarList[weekday] + '.')
+  else:
+    await client.send_message(message.channel if message.channel.name else message.author, "Friday!")
+    await client.send_message(message.channel if message.channel.name else message.author, "/friday")
+
+def emojify(string):
+  emojiMessage = ''
+  for c in string:
+    if not c.isalpha():
+      emojiMessage += c
+      continue
+    emojiMessage += ':regional_indicator_' + c + ':'
+  return emojiMessage
+
+async def emojify_command(message):
+  content = emojify(message.content[9:].lower())
+  author = emojify(message.author.name.lower() + ': ')
+  if hasattr(message.author, 'nick'):
+    author = emojify(message.author.nick.lower() + ': ')
+  channel = message.channel if message.channel.name else message.author
+  emojiMessage = author + "\n\n" + content
+  await client.send_message(channel, emojiMessage)
+  await client.delete_message(message)
   
+async def timecard_reminder(message):
+  global timecard_hour
+  now = datetime.datetime.today()
+  hour = now.hour
+  minute = now.minute
+  day = now.weekday()
+  if(day != 4):
+    return False
+  if(day != 4 and not hour >= 13):
+    return False
+  elif(hour > timecard_hour and not hour >= 17):
+    reminderMessage = '@everyone do not forget to submit your time sheets! You only have ' + str(17-hour) + ' hours left!'
+    await client.send_message(discord.Object(id='514154258245877764'), reminderMessage)
+    timecard_hour = hour
+  elif(hour == 16 and minute >= 30 and hour <= timecard_hour):
+    reminderMessage = '@everyone do not forget to submit your time sheet before you leave!'
+    await client.send_message(discord.Object(id='514154258245877764'), reminderMessage)
+    timecard_hour = 17
+  else:
+    return False
+
+async def set_lunch_command(message):
+  global lunch_hour
+  global lunch_minute
+  global foos_time
+  channel = message.channel if message.channel.name else message.author
+  content = message.content[10:]
+  splitString = content.split(',')
+  lunch_hour = int(splitString[0])
+  lunch_minute = int(splitString[1])
+  now = datetime.datetime.now()
+  newLunch = datetime.datetime(now.year, now.month, now.day, lunch_hour, lunch_minute)
+  foos_time = newLunch + datetime.timedelta(seconds= 30 * 60)
+  await client.send_message(channel, 'Lunch time has been set to ' + newLunch.strftime("%Y-%m-%d %H:%M:%S"))
+  await client.delete_message(message)
+
+async def set_foos_command(message):
+  global foos_time
+  channel = message.channel if message.channel.name else message.author
+  content = message.content[9:]
+  splitString = content.split(',')
+  foos_hour = int(splitString[0])
+  foos_minute = int(splitString[1])
+  now = datetime.datetime.now()
+  foos_time = datetime.datetime(now.year, now.month, now.day, foos_hour, foos_minute)
+  await client.send_message(channel, 'Foos time has been set to ' + foos_time.strftime("%Y-%m-%d %H:%M:%S"))
+  await client.delete_message(message)
+
+async def foos_command(message):
+  global foos_time
+  gifSearches = ['/excited', '/hell yes', '/I\'m ready', '/Let\'s do this', '/Leggo', '/Lunch time']
+  now = datetime.datetime.now()
+  tdelta = foos_time - now
+  delta_seconds = tdelta.seconds
+  if(now.hour == foos_time.hour and now.minute == foos_time.minute):
+    await client.send_message(message.channel, 'You bet! It\'s foos time!')
+  elif(0 > tdelta.days):
+    await client.send_message(message.channel, 'The last foos time was at ' + foos_time.strftime("%H:%M"))
+  elif(now.hour == foos_time.hour):
+    if(10 * 60 > delta_seconds):
+      await client.send_message(message.channel, 'Almost foos time. I\'m so excited. Are you excited?')
+      randomInt = random.randint(0, len(gifSearches)-1)
+      await client.send_message(message.channel, gifSearches[randomInt])
+    elif(30 * 60 > delta_seconds):
+      await client.send_message(message.channel, 'Almost there! Less than thirty minutes.')
+  else:
+    minutes = str(now.minute)
+    if( len(str(now.minute)) == 1 ):
+      minutes = "0" + str(now.minute)
+    await client.send_message(message.channel, 'Not foos time yet. Foos is at ' + datetime.datetime(now.year, now.month, now.day, foos_time.hour, foos_time.minute).strftime("%H:%M"))
+  await client.delete_message(message)
+
+async def count_audit(message):
+  try:
+    oldCount = -1
+    newCount = -1
+    first = True
+    async for serverMessage in client.logs_from(message.channel, limit=2):
+      if(first):
+        newCount = int(serverMessage.content)
+        first = False
+        continue
+      oldCount = int(serverMessage.content)
+      if(newCount != oldCount + 1):
+        await client.delete_message(message)
+  except:
+    await client.delete_message(message)
+  
+    
+    
+    
+
 @client.event
 async def on_ready():
     #info
+    global timecard_hour
+    global lunch_hour
+    global lunch_minute
+    global foos_time
+    global mess_with_kevin
     print('Logged in as')
     print(client.user.name)
     print(client.user.id)
@@ -302,13 +493,36 @@ async def on_ready():
     if( not (Path("VoiceFiles/init.wav").is_file())):
       textToWav("init", "VoiceFiles/init.wav")
     print(len(client.messages))
+    now = datetime.datetime.now()
+    timecard_hour = 12
+    lunch_hour = 11
+    lunch_minute = 30
+    lunch_time = datetime.datetime(now.year, now.month, now.day, lunch_hour, lunch_minute)
+    foos_time = lunch_time + datetime.timedelta(seconds=30*60)
+    mess_with_kevin = False
+
+
+
+
 
 @client.event
 async def on_message(message):
-  if(message.author != client.user):
+  global mess_with_kevin
+  if(message.author != client.user and message.channel.name):
     print(message.author.name + " said: \"" + message.content + "\" in #" + message.channel.name + " @ " + time.ctime())
+  elif(message.author != client.user and not message.channel.name):
+    print(message.author.name + " said: \"" + message.content + "\" privately")
   await pre_add_reaction(message)
-  if(message.content.startswith('!voice')):
+  if(mess_with_kevin and message.author.id == '122149736659681282' and (message.content.startswith('!') or message.content.startswith('/'))):
+    await client.send_message(message.author, 'Command not recognized. Please try again.')
+    await client.send_message(message.author, '!downvote <@!122149736659681282>')
+    await client.delete_message(message)
+    return 0
+  if(message.author != client.user and message.channel.name):
+    await timecard_reminder(message)
+  if(message.channel.id == '540194885865832518'):
+    await count_audit(message)
+  elif(message.content.startswith('!voice')):
     if(message.author.id == '159785058381725696' or message.author.id == '328175857707253760' or message.author.id == '314840626820677643' or message.author.id == '209415024354000897'): #These are user IDs and the logic only allows the players with this user ID to use this command
       if(len(message.content) < len('!voice ')):
         await client.send_message(message.channel, 'Please provide a voice channel id')
@@ -344,11 +558,31 @@ async def on_message(message):
     await vote_command(message, 'up')
   elif(message.content.startswith('!votes')):
     await vote_command(message, 'display')
-  elif(message.content == '!lunchtime'):
+  elif(message.content.lower() == '!lunchtime' or message.content.lower() == '!lunch'):
     await lunch_command(message)
   elif(message.content.startswith('!Mark')):
     await mark_command(message)
+  elif(message.content.startswith('!sendMessage')):
+    await client.send_message(discord.Object(id='514154258245877764'), message.content[12:])
+  elif(message.content.lower().startswith('i\'m')):
+    if(' ' not in message.content[4:]):
+      await client.send_message(message.channel if message.channel.name else message.author, "Hi " + message.content[4:] + ", I\'m Roboto.")
+  elif(message.content.lower().startswith('!friday')):
+    await friday_command(message)
+  elif(message.content.lower().startswith('!emojify')):
+    await emojify_command(message)
+  elif(message.content.lower().startswith('!setlunch')):
+    await set_lunch_command(message)
+  elif(message.content.lower().startswith('!setfoos')):
+    await set_foos_command(message)
+  elif(message.content.lower().startswith('!foos')):
+    await foos_command(message)
+  elif(message.content.lower() == 'lol'):
+    await client.send_message(message.channel if message.channel.name else message.author, 'lo\nlo\nlol')
+  elif(message.content.lower() == ('!messwithkevin')):
+    mess_with_kevin = not mess_with_kevin
+    await client.send_message(message.author, 'Mess with kevin = ' + str(mess_with_kevin))
   elif(message.content.startswith('/')):
-    await giphy_command(message)
+    await giphy_command(message.content, message.author, message)
 
 client.run("") #Add your own bot's token here
