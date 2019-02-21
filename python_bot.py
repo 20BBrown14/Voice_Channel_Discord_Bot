@@ -18,6 +18,7 @@ from discord.utils import get
 from dateutil.relativedelta import relativedelta
 import calendar
 from threading import Timer
+from pyshorteners import Shortener
 #from dateutil.parser import parse
 
 global player
@@ -29,6 +30,9 @@ global lunch_hour
 global lunch_minute
 global foos_time
 global mess_with_kevin
+global thirtyMinWarning
+discordApiKey = '' #Add your own bots token here
+giphyApiKey = '' #Add your own giphy api key here
 
 client = Client()
 
@@ -131,7 +135,7 @@ async def giphy_command(messageContent, author, message):
     if search_params[i] == ' ':
       search_params_sb = search_params_sb + search_params[len(search_params_sb):i] + '+'
   search_params_sb = search_params_sb + search_params[len(search_params_sb):]
-  data = json.loads(urllib.request.urlopen('http://api.giphy.com/v1/gifs/search?q='+search_params_sb+'&api_key=&limit=100').read()) #Add your own giphy API here key
+  data = json.loads(urllib.request.urlopen('http://api.giphy.com/v1/gifs/search?q='+search_params_sb+'&api_key=' + giphyApiKey + '&limit=100').read())
   if(len(data["data"]) <= 0 ):
     await client.send_message(author, "Sorry, but '"+messageContent[1:] + "' returned no results from Giphy.")
   else:
@@ -289,26 +293,26 @@ async def vote_command(message, vote):
 async def mark_command(message):
   now = datetime.datetime.now()
   then = datetime.datetime(2019,2,18,8,30,0)
-  timeString = str(then-now)
-  timeDelta = (then-now)
+  timeString = str(now-then)
+  timeDelta = (now-then)
   reply = ''
   FORMATCASE = "ALL"
   months, days = divmod(timeDelta.days, 31)
   hours, remainder = divmod(timeDelta.seconds, 3600)
   minutes, seconds = divmod(remainder, 60)
   if(months and days):
-    reply = "There are %d months, %d days, %d hours, %d minutes, and %d seconds until Mark gets rekt at foosball" % (months, days, hours, minutes, seconds)
+    reply = "There has been %d months, %d days, %d hours, %d minutes, and %d seconds since <@!547509875308232745> got rekt at foosball" % (months, days, hours, minutes, seconds)
   elif(months and not days):
-    reply = "There are %d months, %d hours, %d minutes, and %d seconds until Mark gets rekt at foosball" % (months, hours, minutes, seconds)
+    reply = "There has been %d months, %d hours, %d minutes, and %d seconds since <@!547509875308232745> got rekt at foosball" % (months, hours, minutes, seconds)
   elif(not months and days):
-    reply = "There are %d days, %d hours, %d minutes, and %d seconds until Mark gets rekt at foosball" % (days, hours, minutes, seconds)
+    reply = "There has been %d days, %d hours, %d minutes, and %d seconds since <@!547509875308232745> got rekt at foosball" % (days, hours, minutes, seconds)
   elif(not months and not days):
-    reply = "There are  %d hours, %d minutes, and %d seconds until Mark gets rekt at foosball" % (hours, minutes, seconds)
+    reply = "There has been %d hours, %d minutes, and %d seconds since <@!547509875308232745> got rekt at foosball" % (hours, minutes, seconds)
   await client.send_message(message.channel, reply)
   await client.delete_message(message)
 
 async def pre_add_reaction(message):
-  users = { 'Branden': '<@!159785058381725696>', 'Harold': '<@!451156129830141975>', 'Grant': '<@!314454492756180994>', 'Kevin': '<@!122149736659681282>'}
+  users = { 'Branden': '<@!159785058381725696>', 'Harold': '<@!451156129830141975>', 'Grant': '<@!314454492756180994>', 'Kevin': '<@!122149736659681282>', 'Mark': '<@!547509875308232745>'}
   if(users['Branden'] in message.content):
     emoji = get(client.get_all_emojis(), name='Branden')
     await client.add_reaction(message, emoji)
@@ -321,7 +325,7 @@ async def pre_add_reaction(message):
   if(users['Kevin'] in message.content):
     emoji = get(client.get_all_emojis(), name='Kevin')
     await client.add_reaction(message, emoji)
-  if('Mark' in message.content):
+  if(users['Mark'] in message.content):
     emoji = get(client.get_all_emojis(), name='Mark')
     await client.add_reaction(message, emoji)
   
@@ -382,6 +386,7 @@ async def emojify_command(message):
   
 async def timecard_reminder(message):
   global timecard_hour
+  global thirtyMinWarning
   now = datetime.datetime.today()
   hour = now.hour
   minute = now.minute
@@ -394,7 +399,8 @@ async def timecard_reminder(message):
     reminderMessage = '@everyone do not forget to submit your time sheets! You only have ' + str(17-hour) + ' hours left!'
     await client.send_message(discord.Object(id='514154258245877764'), reminderMessage)
     timecard_hour = hour
-  elif(hour == 16 and minute >= 30 and hour <= timecard_hour):
+  elif(hour == 16 and minute >= 30 and hour <= timecard_hour and not thirtyMinWarning):
+    thirtyMinWarning = True
     reminderMessage = '@everyone do not forget to submit your time sheet before you leave!'
     await client.send_message(discord.Object(id='514154258245877764'), reminderMessage)
     timecard_hour = 17
@@ -467,6 +473,22 @@ async def count_audit(message):
         await client.delete_message(message)
   except:
     await client.delete_message(message)
+
+async def google_command(message):
+  search = message.content[7:]
+  modifiedSearchString = ''
+  lmgtfyPrefix = 'https://lmgtfy.com/?q='
+  for c in search:
+    if c == ' ':
+      modifiedSearchString += '+'
+    else:
+      modifiedSearchString += c
+  try:
+    shortener = Shortener('Tinyurl')
+    await client.send_message(message.channel if message.channel.name else message.author, shortener.short(lmgtfyPrefix + modifiedSearchString))
+  except:
+    await client.send_message(message.author, 'Something went wrong shortening the URL. Here is the raw link: ' + lmgtfyPrefix + modifiedSearchString)
+  await client.delete_message(message)
   
     
     
@@ -480,6 +502,7 @@ async def on_ready():
     global lunch_minute
     global foos_time
     global mess_with_kevin
+    global thirtyMinWarning
     print('Logged in as')
     print(client.user.name)
     print(client.user.id)
@@ -500,6 +523,7 @@ async def on_ready():
     lunch_time = datetime.datetime(now.year, now.month, now.day, lunch_hour, lunch_minute)
     foos_time = lunch_time + datetime.timedelta(seconds=30*60)
     mess_with_kevin = False
+    thirtyMinWarning = False
 
 
 
@@ -577,12 +601,15 @@ async def on_message(message):
     await set_foos_command(message)
   elif(message.content.lower().startswith('!foos')):
     await foos_command(message)
+  elif(message.content.lower().startswith('!google')):
+    await google_command(message)
   elif(message.content.lower() == 'lol'):
     await client.send_message(message.channel if message.channel.name else message.author, 'lo\nlo\nlol')
   elif(message.content.lower() == ('!messwithkevin')):
-    mess_with_kevin = not mess_with_kevin
-    await client.send_message(message.author, 'Mess with kevin = ' + str(mess_with_kevin))
+    if (message.author.id == '159785058381725696'):
+      mess_with_kevin = not mess_with_kevin
+      await client.send_message(message.channel if message.channel.name else message.author, 'Mess with kevin = ' + str(mess_with_kevin))
   elif(message.content.startswith('/')):
     await giphy_command(message.content, message.author, message)
 
-client.run("") #Add your own bot's token here
+client.run(discordApiKey)
