@@ -38,6 +38,14 @@ client = Client()
 def member_change():
   global old_voice_members
   global player
+  if not os.path.exists("VoiceFiles"):
+      os.makedirs("VoiceFiles")
+    if( not (Path("VoiceFiles/joined.wav").is_file())):
+      textToWav("Has joined the channel", "VoiceFiles/joined.wav")
+    if( not (Path("VoiceFiles/left.wav").is_file())):
+      textToWav("Has left the channel", "VoiceFiles/left.wav")
+    if( not (Path("VoiceFiles/init.wav").is_file())):
+      textToWav("init", "VoiceFiles/init.wav")
   if not (len(old_voice_members) == len(voice_channel.voice_members)):
     print("member change")
     if(len(old_voice_members) > len(voice_channel.voice_members)):
@@ -507,14 +515,6 @@ async def on_ready():
     print(client.user.name)
     print(client.user.id)
     print('------')
-    if not os.path.exists("VoiceFiles"):
-      os.makedirs("VoiceFiles")
-    if( not (Path("VoiceFiles/joined.wav").is_file())):
-      textToWav("Has joined the channel", "VoiceFiles/joined.wav")
-    if( not (Path("VoiceFiles/left.wav").is_file())):
-      textToWav("Has left the channel", "VoiceFiles/left.wav")
-    if( not (Path("VoiceFiles/init.wav").is_file())):
-      textToWav("init", "VoiceFiles/init.wav")
     print(len(client.messages))
     now = datetime.datetime.now()
     timecard_hour = 12
