@@ -1,5 +1,4 @@
-#import discord #You'll need to install this
-from discord import Client
+from discord import Client #you'll need this install
 import discord
 import random
 import time
