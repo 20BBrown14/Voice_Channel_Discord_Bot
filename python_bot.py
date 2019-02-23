@@ -20,7 +20,6 @@ import calendar
 from threading import Timer
 from pyshorteners import Shortener
 import config #Store bot token and giphy api key here
-#from dateutil.parser import parse
 
 global player
 global voice_client
