@@ -142,7 +142,7 @@ async def giphy_command(messageContent, author, message):
     if search_params[i] == ' ':
       search_params_sb = search_params_sb + search_params[len(search_params_sb):i] + '+'
   search_params_sb = search_params_sb + search_params[len(search_params_sb):]
-  data = json.loads(urllib.request.urlopen('http://api.giphy.com/v1/gifs/search?q='+search_params_sb+'&api_key=' + giphyApiKey + '&limit=100').read())
+  data = json.loads(urllib.request.urlopen('http://api.giphy.com/v1/gifs/search?q='+search_params_sb+'&api_key=' + str(giphyApiKey) + '&limit=100').read())
   if(len(data["data"]) <= 0 ):
     await client.send_message(author, "Sorry, but '"+messageContent[1:] + "' returned no results from Giphy.")
   else:
