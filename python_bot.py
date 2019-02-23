@@ -264,9 +264,9 @@ async def vote_command(message, vote):
           print("Someone tried to upvote themselves")
       rows.append(row)
     if not foundName:
-      if(vote == 'down' and row['name'] != message.author.mention):
+      if(vote == 'down' and content != message.author.mention):
         newRow = OrderedDict([('name', content), ('upvotes', '0'), ('downvotes', '-1'), ('net', '-1')])
-      elif(vote == 'up' and row['name'] != message.author.mention):
+      elif(vote == 'up' and content != message.author.mention):
         newRow = OrderedDict([('name', content), ('upvotes', '1'), ('downvotes', '0'), ('net', '1')])
       rows.append(newRow)
   with open('votes.csv', mode='w') as csv_file:
