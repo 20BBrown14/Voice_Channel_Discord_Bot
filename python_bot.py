@@ -19,6 +19,7 @@ from dateutil.relativedelta import relativedelta
 import calendar
 from threading import Timer
 from pyshorteners import Shortener
+import config #Store bot token and giphy api key here
 #from dateutil.parser import parse
 
 global player
@@ -31,8 +32,8 @@ global lunch_minute
 global foos_time
 global mess_with_kevin
 global thirtyMinWarning
-discordApiKey = '' #Add your own bots token here
-giphyApiKey = '' #Add your own giphy api key here
+discordApiKey = config.bot_token #from config.py file
+giphyApiKey = config.giphy_api_key #from config.py file
 
 client = Client()
 
@@ -190,8 +191,9 @@ async def help_command(message):
   < !lunchtime >: If it's 11:30AM it's lunch time!
   < /[emote] >: Invoking a slash command will make me search for a relevant gif and then post it
   My main purpose on this server is to announce when users leave or join the voice channel I am in.
+  I am a little open source whore. See my birthday suit here: https://github.com/20BBrown14/Voice_Channel_Discord_Bot
   Nibikk is the creator of me, contact him if you have any questions.
-  Last updated 11/27/2018""" #Change the text here to customize your help message.
+  Last updated 02/21/2019""" #Change the text here to customize your help message.
   await client.send_message(channel, help_message)
   await client.delete_message(message)
 
