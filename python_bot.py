@@ -533,7 +533,7 @@ async def on_ready():
 async def on_message(message):
   global mess_with_kevin
   if(message.author != client.user and message.channel.name):
-    message_string = message.author.name + " said : \"" + message.content + "\" in #" + message.channel.name + " @ " + time.ctime())
+    message_string = (message.author.name + " said : \"" + message.content + "\" in #" + message.channel.name + " @ " + time.ctime())
     print(message_string)
     await client.send_message(discord.Object(id='549667908884889602'), message_string)
   elif(message.author != client.user and not message.channel.name):
