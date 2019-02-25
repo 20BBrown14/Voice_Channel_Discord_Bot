@@ -609,6 +609,8 @@ async def on_message(message):
     if (message.author.id == '159785058381725696'):
       mess_with_kevin = not mess_with_kevin
       await client.send_message(message.channel if message.channel.name else message.author, 'Mess with kevin = ' + str(mess_with_kevin))
+  elif(message.content.lower() == ('!version')):
+    await client.send_message(message.channel if message.channel.name else message.author, 'Version: 02252019-1')
   elif(message.content.startswith('/')):
     await giphy_command(message.content, message.author, message)
 
