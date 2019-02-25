@@ -533,7 +533,9 @@ async def on_ready():
 async def on_message(message):
   global mess_with_kevin
   if(message.author != client.user and message.channel.name):
-    print(message.author.name + " said: \"" + message.content + "\" in #" + message.channel.name + " @ " + time.ctime())
+    message_string = message.author.name + " said : \"" + message.content + "\" in #" + message.channel.name + " @ " + time.ctime())
+    print(message_string)
+    await client.send_message(discord.Object(id='549667908884889602'), message_string)
   elif(message.author != client.user and not message.channel.name):
     print(message.author.name + " said: \"" + message.content + "\" privately")
   await pre_add_reaction(message)
@@ -610,7 +612,7 @@ async def on_message(message):
       mess_with_kevin = not mess_with_kevin
       await client.send_message(message.channel if message.channel.name else message.author, 'Mess with kevin = ' + str(mess_with_kevin))
   elif(message.content.lower() == ('!version')):
-    await client.send_message(message.channel if message.channel.name else message.author, 'Version: 02252019-1')
+    await client.send_message(message.channel if message.channel.name else message.author, 'Version: 02252019-2')
   elif(message.content.startswith('/')):
     await giphy_command(message.content, message.author, message)
 
