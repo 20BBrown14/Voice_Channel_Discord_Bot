@@ -497,10 +497,6 @@ async def google_command(message):
   except:
     await client.send_message(message.author, 'Something went wrong shortening the URL. Here is the raw link: ' + lmgtfyPrefix + modifiedSearchString)
   await client.delete_message(message)
-  
-    
-    
-    
 
 @client.event
 async def on_ready():
@@ -525,12 +521,10 @@ async def on_ready():
     mess_with_kevin = False
     thirtyMinWarning = False
 
-
-
-
-
 @client.event
 async def on_message(message):
+  if(message.channel.name == 'logs'):
+    return 0
   global mess_with_kevin
   if(message.author != client.user and message.channel.name):
     message_string = (message.author.name + " said : \"" + message.content + "\" in #" + message.channel.name + " @ " + time.ctime())
@@ -548,18 +542,10 @@ async def on_message(message):
     await timecard_reminder(message)
   if(message.channel.id == '540194885865832518'):
     await count_audit(message)
-  elif(message.content.startswith('!voice')):
-    if(message.author.id == '159785058381725696' or message.author.id == '328175857707253760' or message.author.id == '314840626820677643' or message.author.id == '209415024354000897'): #These are user IDs and the logic only allows the players with this user ID to use this command
-      if(len(message.content) < len('!voice ')):
-        await client.send_message(message.channel, 'Please provide a voice channel id')
-        return
-      channelId = message.content[len('!voice '):]
-      await client.send_message(message.channel, 'Joining voice channel with\nID: ' + channelId +'\nName: ' + client.get_channel(channelId).name)
-      await join_voice(channelId)
-      print("Joined voice channel with Id")
-    else:
-      count = 0
-      await client.send_message(message.channel, "Sorry, you do not have permission to use this command. Please contact Nibikk if you have any questions.") #Change this line to yourself or simply "Bot Admin"
+  elif(message.content.startswith('/')):
+    await giphy_command(message.content, message.author, message)
+  elif(message.content.lower() == ('!version')):
+    await client.send_message(message.channel if message.channel.name else message.author, 'Version: 02252019-3')
   elif(message.content.startswith('!status')):
     await client.send_message(message.channel, 'I am here')
   elif(message.content.startswith('!help')):
@@ -611,9 +597,17 @@ async def on_message(message):
     if (message.author.id == '159785058381725696'):
       mess_with_kevin = not mess_with_kevin
       await client.send_message(message.channel if message.channel.name else message.author, 'Mess with kevin = ' + str(mess_with_kevin))
-  elif(message.content.lower() == ('!version')):
-    await client.send_message(message.channel if message.channel.name else message.author, 'Version: 02252019-2')
-  elif(message.content.startswith('/')):
-    await giphy_command(message.content, message.author, message)
+  elif(message.content.startswith('!voice')):
+    if(message.author.id == '159785058381725696' or message.author.id == '328175857707253760' or message.author.id == '314840626820677643' or message.author.id == '209415024354000897'): #These are user IDs and the logic only allows the players with this user ID to use this command
+      if(len(message.content) < len('!voice ')):
+        await client.send_message(message.channel, 'Please provide a voice channel id')
+        return
+      channelId = message.content[len('!voice '):]
+      await client.send_message(message.channel, 'Joining voice channel with\nID: ' + channelId +'\nName: ' + client.get_channel(channelId).name)
+      await join_voice(channelId)
+      print("Joined voice channel with Id")
+    else:
+      count = 0
+      await client.send_message(message.channel, "Sorry, you do not have permission to use this command. Please contact Nibikk if you have any questions.") #Change this line to yourself or simply "Bot Admin"
 
 client.run(discordApiKey)
