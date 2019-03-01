@@ -33,6 +33,11 @@ global thirtyMinWarning
 discordApiKey = config.bot_token #from config.py file
 giphyApiKey = config.giphy_api_key #from config.py file
 
+# Update for each revision using format yyyy-mm-dd_#
+# where '#' is the release number for that day.
+# e.g. 2019-03-31_1 is the first relase of March 1st, 2019
+version = '2019-03-01_1'
+
 client = Client()
 
 def member_change():
@@ -545,7 +550,7 @@ async def on_message(message):
   elif(message.content.startswith('/')):
     await giphy_command(message.content, message.author, message)
   elif(message.content.lower() == ('!version')):
-    await client.send_message(message.channel if message.channel.name else message.author, 'Version: 02252019-3')
+    await client.send_message(message.channel if message.channel.name else message.author, 'Version: ' + version)
   elif(message.content.startswith('!status')):
     await client.send_message(message.channel, 'I am here')
   elif(message.content.startswith('!help')):
