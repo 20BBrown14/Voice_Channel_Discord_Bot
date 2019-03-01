@@ -12,6 +12,8 @@ Follow instructions on how to install discord.py for your operating system
 
 Follow instructions on how to install python for your operating system
 
+You will need to setup a config.py file. A template is provided: TEMPLATE_config.py
+
 ### Windows
 Win + R
 
