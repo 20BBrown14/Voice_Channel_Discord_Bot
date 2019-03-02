@@ -1,25 +1,28 @@
+
+# library imports
+import calendar
+from collections import OrderedDict
+import csv
+from datetime import datetime,timedelta
+from dateutil.relativedelta import relativedelta
+import datetime
 from discord import Client #you'll need this install
+from discord.utils import get
 import discord
+import json
+import os
+from pathlib import Path
+from pyshorteners import Shortener
 import random
-import time
 import subprocess #You'll need to install this and also download espeak and put in the same directory as this source code.
 import threading
-import os
-import urllib.request
-import json
-from pathlib import Path
-from datetime import datetime
-from datetime import datetime,timedelta
-import datetime
-import csv
-from collections import OrderedDict
-from discord.utils import get
-from dateutil.relativedelta import relativedelta
-import calendar
 from threading import Timer
-from pyshorteners import Shortener
-import config #Store bot token and giphy api key here
-#test comment 2
+import time
+import urllib.request
+
+# local file imports
+import config
+
 global player
 global voice_client
 global voice_channel
@@ -30,8 +33,17 @@ global lunch_minute
 global foos_time
 global mess_with_kevin
 global thirtyMinWarning
-discordApiKey = config.bot_token #from config.py file
-giphyApiKey = config.giphy_api_key #from config.py file
+
+#from config.py file
+discordApiKey = config.bot_token 
+giphyApiKey = config.giphy_api_key
+
+# User IDs
+id_branden = '159785058381725696'
+id_grant   = '314454492756180994'
+id_kevin   = '122149736659681282'
+id_mark    = '547509875308232745'
+id_harold  = '451156129830141975'
 
 # Update for each revision using format yyyy-mm-dd_#
 # where '#' is the release number for that day.
@@ -314,18 +326,18 @@ async def mark_command(message):
   hours, remainder = divmod(timeDelta.seconds, 3600)
   minutes, seconds = divmod(remainder, 60)
   if(months and days):
-    reply = "There has been %d months, %d days, %d hours, %d minutes, and %d seconds since <@!547509875308232745> got rekt at foosball" % (months, days, hours, minutes, seconds)
+    reply = "There has been %d months, %d days, %d hours, %d minutes, and %d seconds since <@!" + id_mark + "> got rekt at foosball" % (months, days, hours, minutes, seconds)
   elif(months and not days):
-    reply = "There has been %d months, %d hours, %d minutes, and %d seconds since <@!547509875308232745> got rekt at foosball" % (months, hours, minutes, seconds)
+    reply = "There has been %d months, %d hours, %d minutes, and %d seconds since <@!" + id_mark + "> got rekt at foosball" % (months, hours, minutes, seconds)
   elif(not months and days):
-    reply = "There has been %d days, %d hours, %d minutes, and %d seconds since <@!547509875308232745> got rekt at foosball" % (days, hours, minutes, seconds)
+    reply = "There has been %d days, %d hours, %d minutes, and %d seconds since <@!" + id_mark + "> got rekt at foosball" % (days, hours, minutes, seconds)
   elif(not months and not days):
-    reply = "There has been %d hours, %d minutes, and %d seconds since <@!547509875308232745> got rekt at foosball" % (hours, minutes, seconds)
+    reply = "There has been %d hours, %d minutes, and %d seconds since <@!" + id_mark + "> got rekt at foosball" % (hours, minutes, seconds)
   await client.send_message(message.channel, reply)
   await client.delete_message(message)
 
 async def pre_add_reaction(message):
-  users = { 'Branden': '<@!159785058381725696>', 'Harold': '<@!451156129830141975>', 'Grant': '<@!314454492756180994>', 'Kevin': '<@!122149736659681282>', 'Mark': '<@!547509875308232745>'}
+  users = { 'Branden': '<@!' + id_branden + '>', 'Harold': '<@!' + id_harold + '>', 'Grant': '<@!' + id_grant + '>', 'Kevin': '<@!' + id_kevin + '>', 'Mark': '<@!' + id_kevin + '>'}
   if(users['Branden'] in message.content):
     emoji = get(client.get_all_emojis(), name='Branden')
     await client.add_reaction(message, emoji)
@@ -538,9 +550,9 @@ async def on_message(message):
   elif(message.author != client.user and not message.channel.name):
     print(message.author.name + " said: \"" + message.content + "\" privately")
   await pre_add_reaction(message)
-  if(mess_with_kevin and message.author.id == '122149736659681282' and (message.content.startswith('!') or message.content.startswith('/'))):
+  if(mess_with_kevin and message.author.id == id_kevin and (message.content.startswith('!') or message.content.startswith('/'))):
     await client.send_message(message.author, 'Command not recognized. Please try again.')
-    await client.send_message(message.author, '!downvote <@!122149736659681282>')
+    await client.send_message(message.author, '!downvote <@!' + id_kevin + '>')
     await client.delete_message(message)
     return 0
   if(message.author != client.user and message.channel.name):
@@ -558,7 +570,7 @@ async def on_message(message):
   elif(message.content.startswith('!ping')):
     await ping_command(message)
   elif(message.content.startswith('!stopvoice')):
-    if(message.author.id == '159785058381725696' or message.author.id == '328175857707253760'):
+    if(message.author.id == id_branden or message.author.id == '328175857707253760'):
       await stop_voice(message)
   elif(message.content.startswith('/r/')):
     await reddit_link(message)
@@ -567,7 +579,7 @@ async def on_message(message):
   elif(message.content.startswith('!pizza')):
     await client.send_message(message.channel, 'Pizza? Who\'s paying for this? Not me.')
   elif(message.content.startswith('!Mugglewump')):
-    if(message.author.id == '159785058381725696' or message.author.id == '83809782691004416'):
+    if(message.author.id == id_branden or message.author.id == '83809782691004416'):
       await client.send_message(message.channel, '<@328175857707253760> is a dope Templar!')
   elif(message.content.startswith('!downvote')):
     await vote_command(message, 'down')
@@ -599,11 +611,11 @@ async def on_message(message):
   elif(message.content.lower() == 'lol'):
     await client.send_message(message.channel if message.channel.name else message.author, 'lo\nlo\nlol')
   elif(message.content.lower() == ('!messwithkevin')):
-    if (message.author.id == '159785058381725696'):
+    if (message.author.id == id_branden):
       mess_with_kevin = not mess_with_kevin
       await client.send_message(message.channel if message.channel.name else message.author, 'Mess with kevin = ' + str(mess_with_kevin))
   elif(message.content.startswith('!voice')):
-    if(message.author.id == '159785058381725696' or message.author.id == '328175857707253760' or message.author.id == '314840626820677643' or message.author.id == '209415024354000897'): #These are user IDs and the logic only allows the players with this user ID to use this command
+    if(message.author.id == id_branden or message.author.id == '328175857707253760' or message.author.id == '314840626820677643' or message.author.id == '209415024354000897'): #These are user IDs and the logic only allows the players with this user ID to use this command
       if(len(message.content) < len('!voice ')):
         await client.send_message(message.channel, 'Please provide a voice channel id')
         return
