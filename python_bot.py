@@ -570,7 +570,7 @@ async def on_message(message):
   elif(message.content.startswith('!ping')):
     await ping_command(message)
   elif(message.content.startswith('!stopvoice')):
-    if(message.author.id == id_branden or message.author.id == '328175857707253760'):
+    if(message.author.id == id_branden):
       await stop_voice(message)
   elif(message.content.startswith('/r/')):
     await reddit_link(message)
