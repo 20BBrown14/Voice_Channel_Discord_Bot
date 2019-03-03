@@ -578,9 +578,6 @@ async def on_message(message):
     await clean_command(message)
   elif(message.content.startswith('!pizza')):
     await client.send_message(message.channel, 'Pizza? Who\'s paying for this? Not me.')
-  elif(message.content.startswith('!Mugglewump')):
-    if(message.author.id == id_branden or message.author.id == '83809782691004416'):
-      await client.send_message(message.channel, '<@328175857707253760> is a dope Templar!')
   elif(message.content.startswith('!downvote')):
     await vote_command(message, 'down')
   elif(message.content.startswith('!upvote')):
@@ -615,7 +612,7 @@ async def on_message(message):
       mess_with_kevin = not mess_with_kevin
       await client.send_message(message.channel if message.channel.name else message.author, 'Mess with kevin = ' + str(mess_with_kevin))
   elif(message.content.startswith('!voice')):
-    if(message.author.id == id_branden or message.author.id == '328175857707253760' or message.author.id == '314840626820677643' or message.author.id == '209415024354000897'): #These are user IDs and the logic only allows the players with this user ID to use this command
+    if(message.author.id == id_branden): # only users in this if can use this command
       if(len(message.content) < len('!voice ')):
         await client.send_message(message.channel, 'Please provide a voice channel id')
         return
