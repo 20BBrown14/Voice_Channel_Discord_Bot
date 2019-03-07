@@ -48,7 +48,7 @@ id_harold  = '451156129830141975'
 # Update for each revision using format yyyy-mm-dd_#
 # where '#' is the release number for that day.
 # e.g. 2019-03-31_1 is the first relase of March 1st, 2019
-version = '2019-03-03_1'
+version = '2019-03-07_1'
 
 client = Client()
 
@@ -337,7 +337,7 @@ async def mark_command(message):
   await client.delete_message(message)
 
 async def pre_add_reaction(message):
-  users = { 'Branden': '<@!' + id_branden + '>', 'Harold': '<@!' + id_harold + '>', 'Grant': '<@!' + id_grant + '>', 'Kevin': '<@!' + id_kevin + '>', 'Mark': '<@!' + id_kevin + '>'}
+  users = { 'Branden': '<@!' + id_branden + '>', 'Harold': '<@!' + id_harold + '>', 'Grant': '<@!' + id_grant + '>', 'Kevin': '<@!' + id_kevin + '>', 'Mark': '<@!' + id_mark + '>'}
   if(users['Branden'] in message.content):
     emoji = get(client.get_all_emojis(), name='Branden')
     await client.add_reaction(message, emoji)
@@ -559,8 +559,6 @@ async def on_message(message):
     await timecard_reminder(message)
   if(message.channel.id == '540194885865832518'):
     await count_audit(message)
-  elif(message.content.startswith('/')):
-    await giphy_command(message.content, message.author, message)
   elif(message.content.lower() == ('!version')):
     await client.send_message(message.channel if message.channel.name else message.author, 'Version: ' + version)
   elif(message.content.startswith('!status')):
@@ -574,6 +572,8 @@ async def on_message(message):
       await stop_voice(message)
   elif(message.content.startswith('/r/')):
     await reddit_link(message)
+  elif(message.content.startswith('/')):
+    await giphy_command(message.content, message.author, message)
   elif(message.content.startswith('!clean')):
     await clean_command(message)
   elif(message.content.startswith('!pizza')):
