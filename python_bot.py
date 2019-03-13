@@ -48,7 +48,7 @@ id_harold  = '451156129830141975'
 # Update for each revision using format yyyy-mm-dd_#
 # where '#' is the release number for that day.
 # e.g. 2019-03-31_1 is the first relase of March 1st, 2019
-version = '2019-03-07_1'
+version = '2019-03-13_1'
 
 client = Client()
 
@@ -326,13 +326,13 @@ async def mark_command(message):
   hours, remainder = divmod(timeDelta.seconds, 3600)
   minutes, seconds = divmod(remainder, 60)
   if(months and days):
-    reply = "There has been %d months, %d days, %d hours, %d minutes, and %d seconds since <@!" + id_mark + "> got rekt at foosball" % (months, days, hours, minutes, seconds)
+    reply = "There has been %d months, %d days, %d hours, %d minutes, and %d seconds since <@!%s> got rekt at foosball" % (months, days, hours, minutes, seconds, id_mark)
   elif(months and not days):
-    reply = "There has been %d months, %d hours, %d minutes, and %d seconds since <@!" + id_mark + "> got rekt at foosball" % (months, hours, minutes, seconds)
+    reply = "There has been %d months, %d hours, %d minutes, and %d seconds since <@!%s> got rekt at foosball" % (months, hours, minutes, seconds, id_mark)
   elif(not months and days):
-    reply = "There has been %d days, %d hours, %d minutes, and %d seconds since <@!" + id_mark + "> got rekt at foosball" % (days, hours, minutes, seconds)
+    reply = "There has been %d days, %d hours, %d minutes, and %d seconds since <@!%s> got rekt at foosball" % (days, hours, minutes, seconds, id_mark)
   elif(not months and not days):
-    reply = "There has been %d hours, %d minutes, and %d seconds since <@!" + id_mark + "> got rekt at foosball" % (hours, minutes, seconds)
+    reply = "There has been %d hours, %d minutes, and %d seconds since <@!%s> got rekt at foosball" % (hours, minutes, seconds, id_mark)
   await client.send_message(message.channel, reply)
   await client.delete_message(message)
 
