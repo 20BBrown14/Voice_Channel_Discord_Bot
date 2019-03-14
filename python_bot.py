@@ -22,6 +22,7 @@ import urllib.request
 
 # local file imports
 import config
+import commands.help as help
 
 global player
 global voice_client
@@ -48,7 +49,7 @@ id_harold  = '451156129830141975'
 # Update for each revision using format yyyy-mm-dd_#
 # where '#' is the release number for that day.
 # e.g. 2019-03-31_1 is the first relase of March 1st, 2019
-version = '2019-03-13_1'
+version = '2019-03-14_1'
 
 client = Client()
 
@@ -197,28 +198,6 @@ async def ping_command(message):
   d = datetime.datetime.utcnow() - message.timestamp
   s = d.seconds*1000 + d.microseconds//1000
   await client.send_message(message.channel, "Ping: {}ms".format(s))
-
-async def help_command(message):
-  channel = message.channel
-  help_message = """Here are list of available commands:
-  < !help >: *Displays a list of available commands*
-  < !status >: *Replys indicating I am online*
-  < !voice [channel_id] >: *Joins voice channel with specified Id (Special permissions required)*
-  < !ping >: *Responds with your ping*
-  < !stopvoice >: *Disconnects the bot from the current voice channel (Special permissions required)*
-  < !clean [amount] >: *Removes all messages from the channel this command was invoked in that were sent by me or that were commands for the me*
-  < !pizza >: *Just do it*
-  < !downvote @user >: Downvotes a user and keeps track
-  < !upvote @user >: Upvotes a user and keeps track
-  < !votes >: Displays all votes
-  < !lunchtime >: If it's 11:30AM it's lunch time!
-  < /[emote] >: Invoking a slash command will make me search for a relevant gif and then post it
-  My main purpose on this server is to announce when users leave or join the voice channel I am in.
-  I am a little open source whore. See my birthday suit here: https://github.com/20BBrown14/Voice_Channel_Discord_Bot
-  Nibikk is the creator of me, contact him if you have any questions.
-  Last updated 02/21/2019""" #Change the text here to customize your help message.
-  await client.send_message(channel, help_message)
-  await client.delete_message(message)
 
 async def stop_voice(message):
   global voice_client
@@ -563,8 +542,8 @@ async def on_message(message):
     await client.send_message(message.channel if message.channel.name else message.author, 'Version: ' + version)
   elif(message.content.startswith('!status')):
     await client.send_message(message.channel, 'I am here')
-  elif(message.content.startswith('!help')):
-    await help_command(message)
+  elif(message.content.startswith(help.TRIGGER)):
+    await help.command(client, message)
   elif(message.content.startswith('!ping')):
     await ping_command(message)
   elif(message.content.startswith('!stopvoice')):
