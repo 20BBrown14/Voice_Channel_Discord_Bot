@@ -7,3 +7,4 @@ config.py
 /__*
 /**/__*
 pythonUpdateGit.py
+*.swp

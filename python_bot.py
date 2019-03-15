@@ -46,10 +46,15 @@ id_kevin   = '122149736659681282'
 id_mark    = '547509875308232745'
 id_harold  = '451156129830141975'
 
+# Channel IDs
+id_general         = '514154258245877764'
+id_new_bot_testing = '548166917987500053'
+id_count           = '540194885865832518'
+
 # Update for each revision using format yyyy-mm-dd_#
 # where '#' is the release number for that day.
 # e.g. 2019-03-31_1 is the first relase of March 1st, 2019
-version = '2019-03-14_1'
+version = '2019-03-15_1'
 
 client = Client()
 
@@ -401,12 +406,12 @@ async def timecard_reminder(message):
     return False
   elif(hour > timecard_hour and not hour >= 17):
     reminderMessage = '@everyone do not forget to submit your time sheets! You only have ' + str(17-hour) + ' hours left!'
-    await client.send_message(discord.Object(id='514154258245877764'), reminderMessage)
+    await client.send_message(discord.Object(id=id_general), reminderMessage)
     timecard_hour = hour
   elif(hour == 16 and minute >= 30 and hour <= timecard_hour and not thirtyMinWarning):
     thirtyMinWarning = True
     reminderMessage = '@everyone do not forget to submit your time sheet before you leave!'
-    await client.send_message(discord.Object(id='514154258245877764'), reminderMessage)
+    await client.send_message(discord.Object(id=id_general), reminderMessage)
     timecard_hour = 17
   else:
     return False
@@ -516,6 +521,7 @@ async def on_ready():
     foos_time = lunch_time + datetime.timedelta(seconds=30*60)
     mess_with_kevin = False
     thirtyMinWarning = False
+    await client.send_message(discord.Object(id=id_general), "Started with version: " + version)
 
 @client.event
 async def on_message(message):
@@ -536,7 +542,7 @@ async def on_message(message):
     return 0
   if(message.author != client.user and message.channel.name):
     await timecard_reminder(message)
-  if(message.channel.id == '540194885865832518'):
+  if(message.channel.id == id_count):
     await count_audit(message)
   elif(message.content.lower() == ('!version')):
     await client.send_message(message.channel if message.channel.name else message.author, 'Version: ' + version)
@@ -568,7 +574,7 @@ async def on_message(message):
   elif(message.content.startswith('!Mark')):
     await mark_command(message)
   elif(message.content.startswith('!sendMessage')):
-    await client.send_message(discord.Object(id='514154258245877764'), message.content[12:])
+    await client.send_message(discord.Object(id=id_general), message.content[12:])
   elif(message.content.lower().startswith('i\'m')):
     if(' ' not in message.content[4:]):
       await client.send_message(message.channel if message.channel.name else message.author, "Hi " + message.content[4:] + ", I\'m Roboto.")
