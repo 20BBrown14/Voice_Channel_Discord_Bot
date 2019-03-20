@@ -54,7 +54,7 @@ id_count           = '540194885865832518'
 # Update for each revision using format yyyy-mm-dd_#
 # where '#' is the release number for that day.
 # e.g. 2019-03-31_1 is the first relase of March 1st, 2019
-version = '2019-03-15_1'
+version = '2019-03-20_1'
 
 client = Client()
 
@@ -521,7 +521,8 @@ async def on_ready():
     foos_time = lunch_time + datetime.timedelta(seconds=30*60)
     mess_with_kevin = False
     thirtyMinWarning = False
-    await client.send_message(discord.Object(id=id_general), "Started with version: " + version)
+    client_game = discord.Game(name='Goosball v%s' % version)
+    await client.change_status(game = client_game)
 
 @client.event
 async def on_message(message):
