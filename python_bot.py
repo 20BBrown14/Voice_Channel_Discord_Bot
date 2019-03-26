@@ -22,7 +22,7 @@ import urllib.request
 
 # local file imports
 import config
-import commands.help as help
+from commands import help, weather
 
 global player
 global voice_client
@@ -38,6 +38,7 @@ global thirtyMinWarning
 #from config.py file
 discordApiKey = config.bot_token 
 giphyApiKey = config.giphy_api_key
+weather_api_key = config.weather_api_key
 
 # User IDs
 id_branden = '159785058381725696'
@@ -499,6 +500,15 @@ async def google_command(message):
     await client.send_message(message.author, 'Something went wrong shortening the URL. Here is the raw link: ' + lmgtfyPrefix + modifiedSearchString)
   await client.delete_message(message)
 
+async def delete_message(client, message):
+  try:
+    client.get_message(message.channel, message.id)
+    if(message.channel.name):
+      if(not message.channel.name.lower() == 'bot_commands'):
+        await client.delete_message(message)
+  except:
+    print('Message DNE')
+
 @client.event
 async def on_ready():
     #info
@@ -597,6 +607,8 @@ async def on_message(message):
     if (message.author.id == id_branden):
       mess_with_kevin = not mess_with_kevin
       await client.send_message(message.channel if message.channel.name else message.author, 'Mess with kevin = ' + str(mess_with_kevin))
+  elif(message.content.lower().startswith(weather.TRIGGER)):
+    await weather.command(client, message, message.channel if message.channel.name else message.author, delete_message, [], weather_api_key)
   elif(message.content.startswith('!voice')):
     if(message.author.id == id_branden): # only users in this if can use this command
       if(len(message.content) < len('!voice ')):
@@ -609,5 +621,4 @@ async def on_message(message):
     else:
       count = 0
       await client.send_message(message.channel, "Sorry, you do not have permission to use this command. Please contact Nibikk if you have any questions.") #Change this line to yourself or simply "Bot Admin"
-
 client.run(discordApiKey)
