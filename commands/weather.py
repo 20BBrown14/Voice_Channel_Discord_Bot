@@ -3,6 +3,7 @@
 import requests
 import json
 import discord
+import datetime
 
 def weather_help():
   weather_help_message="""
@@ -42,7 +43,6 @@ def precip_string(precip):
     return False
 
 def create_embeded(title, description, icon, min_temp, max_temp, current_temp, humidity, wind_speed, wind_degrees, wind_direction, rain, snow):
-  print(description)
   embed=discord.Embed(title="%s's Weather" % title, description="%s" % description, color=0x00f900)
   if(icon):
     embed.set_thumbnail(url="http://openweathermap.org/img/w/%s.png" % icon)
@@ -62,6 +62,12 @@ def create_embeded(title, description, icon, min_temp, max_temp, current_temp, h
   if(snow):
     embed.add_field(name='Snow', value=snow, inline=True)
   return embed
+
+def update_cache(zipcode, item, weather_cache):
+  now = datetime.datetime.now().timestamp()
+  item['cached_time'] = now
+  weather_cache[zipcode] = item
+  return weather_cache
 
 """
 Weather command
@@ -92,15 +98,21 @@ async def command(client, message, channel, delete_message, weather_cache, weath
     
   if(message_content[:equals_index].strip().lower() == 'zip'):
     zipcode = message_content[equals_index+1:].strip()
-    url = "http://api.openweathermap.org/data/2.5/weather?zip=%s&APPID=%s" % (zipcode, weather_api_key)
-    response = requests.get(url).text
-    JSONResponse = json.loads(response)
-    if(JSONResponse['cod'] == 200):
-      weather = JSONResponse["weather"][0] if 'weather' in JSONResponse else []
-      main = JSONResponse["main"] if 'main' in JSONResponse else []
-      wind = JSONResponse["wind"] if 'wind' in JSONResponse else []
-      rain = JSONResponse["rain"] if 'rain' in JSONResponse else []
-      snow = JSONResponse["snow"] if 'snow' in JSONResponse else []
+    now = datetime.datetime.now().timestamp()
+    weather_data = None
+    if(zipcode in weather_cache and now - weather_cache[zipcode]['cached_time'] < 600):
+      weather_data = weather_cache[zipcode]
+    else:
+      url = "http://api.openweathermap.org/data/2.5/weather?zip=%s&APPID=%s" % (zipcode, weather_api_key)
+      response = requests.get(url).text
+      weather_data = json.loads(response)
+      weather_cache = update_cache(zipcode, weather_data, weather_cache)
+    if(weather_data['cod'] == 200):
+      weather = weather_data["weather"][0] if 'weather' in weather_data else []
+      main = weather_data["main"] if 'main' in weather_data else []
+      wind = weather_data["wind"] if 'wind' in weather_data else []
+      rain = weather_data["rain"] if 'rain' in weather_data else []
+      snow = weather_data["snow"] if 'snow' in weather_data else []
       weather_embeded = create_embeded(zipcode, \
                                       "%s / %s" % (weather['main'], weather['description']) if 'main' in weather and 'description' in weather else 'Weather', \
                                       weather["icon"] if 'icon' in weather else False, \
@@ -115,7 +127,8 @@ async def command(client, message, channel, delete_message, weather_cache, weath
                                       precip_string(snow) \
                                     )
       await client.send_message(channel, embed=weather_embeded)
+      return weather_cache
     else:
-      await client.send_message(message.author, JSONResponse['message'])
+      await client.send_message(message.author, weather_cache['message'])
 
 TRIGGER = '!weather'

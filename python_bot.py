@@ -34,6 +34,7 @@ global lunch_minute
 global foos_time
 global mess_with_kevin
 global thirtyMinWarning
+global weather_cache
 
 #from config.py file
 discordApiKey = config.bot_token 
@@ -518,6 +519,7 @@ async def on_ready():
     global foos_time
     global mess_with_kevin
     global thirtyMinWarning
+    global weather_cache
     print('Logged in as')
     print(client.user.name)
     print(client.user.id)
@@ -532,6 +534,7 @@ async def on_ready():
     mess_with_kevin = False
     thirtyMinWarning = False
     client_game = discord.Game(name='Goosball v%s' % version)
+    weather_cache = json.loads('{}')
     await client.change_status(game = client_game)
 
 @client.event
@@ -608,7 +611,7 @@ async def on_message(message):
       mess_with_kevin = not mess_with_kevin
       await client.send_message(message.channel if message.channel.name else message.author, 'Mess with kevin = ' + str(mess_with_kevin))
   elif(message.content.lower().startswith(weather.TRIGGER)):
-    await weather.command(client, message, message.channel if message.channel.name else message.author, delete_message, [], weather_api_key)
+    await weather.command(client, message, message.channel if message.channel.name else message.author, delete_message, weather_cache, weather_api_key)
   elif(message.content.startswith('!voice')):
     if(message.author.id == id_branden): # only users in this if can use this command
       if(len(message.content) < len('!voice ')):
