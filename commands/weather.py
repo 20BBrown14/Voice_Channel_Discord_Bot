@@ -90,7 +90,6 @@ async def command(client, message, channel, delete_message, weather_cache, weath
 
   if(equals_index < 0): #option not provided
     if(message_content.strip() == 'help'): #weather help command invoked
-      weather_help(client, message, channel)
       await client.send_message(message.author, "%s" % weather_help())
       return
     await client.send_message(message.author, "Please ensure you're using one of the follow options:\n%s" % weather_help())
