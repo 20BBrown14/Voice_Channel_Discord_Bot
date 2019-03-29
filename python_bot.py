@@ -22,7 +22,7 @@ import urllib.request
 
 # local file imports
 import config
-from commands import help, weather
+from commands import help, weather, single_giphy_results_display
 
 global player
 global voice_client
@@ -56,7 +56,7 @@ id_count           = '540194885865832518'
 # Update for each revision using format yyyy-mm-dd_#
 # where '#' is the release number for that day.
 # e.g. 2019-03-31_1 is the first relase of March 1st, 2019
-version = '2019-03-29_1'
+version = '2019-03-29_2'
 
 client = Client()
 
@@ -168,6 +168,19 @@ async def giphy_command(messageContent, author, message):
       search_params_sb = search_params_sb + search_params[len(search_params_sb):i] + '+'
   search_params_sb = search_params_sb + search_params[len(search_params_sb):]
   data = json.loads((urllib.request.urlopen('http://api.giphy.com/v1/gifs/search?q='+search_params_sb+'&api_key=' + str(giphyApiKey) + '&limit=100').read()).decode('utf-8'))
+  if(len(data["data"]) == 1):
+    if(os.path.isfile('single_giphy_results.txt')):
+      f = open('single_giphy_results.txt', 'r')
+      file_contents = f.read()
+      f.close()
+      if(not messageContent[1:] in file_contents):
+        f = open("single_giphy_results.txt", "a")
+        f.write(messageContent[1:] + '\n')
+        f.close()
+    else:
+      f = open("single_giphy_results.txt", 'w')
+      f.write(messageContent[1:] + '\n')
+      f.close()
   if(len(data["data"]) <= 0 ):
     await client.send_message(author, "Sorry, but '"+messageContent[1:] + "' returned no results from Giphy.")
   else:
@@ -604,6 +617,8 @@ async def on_message(message):
     await foos_command(message)
   elif(message.content.lower().startswith('!google')):
     await google_command(message)
+  elif(message.content.lower() == single_giphy_results_display.TRIGGER):
+    await single_giphy_results_display.command(client, message, message.channel if message.channel.name else message.author, delete_message)
   elif(message.content.lower() == 'lol'):
     await client.send_message(message.channel if message.channel.name else message.author, 'lo\nlo\nlol')
   elif(message.content.lower() == ('!messwithkevin')):
