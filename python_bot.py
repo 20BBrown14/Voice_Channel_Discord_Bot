@@ -56,7 +56,7 @@ id_count           = '540194885865832518'
 # Update for each revision using format yyyy-mm-dd_#
 # where '#' is the release number for that day.
 # e.g. 2019-03-31_1 is the first relase of March 1st, 2019
-version = '2019-04-02_3'
+version = '2019-04-02_4'
 
 client = Client()
 
@@ -552,91 +552,94 @@ async def on_ready():
 
 @client.event
 async def on_message(message):
-  if(message.channel.name == 'logs'):
-    return 0
-  global mess_with_kevin
-  if(message.author != client.user and message.channel.name):
-    message_string = (message.author.name + " said : \"" + message.content + "\" in #" + message.channel.name + " @ " + time.ctime())
-    print(message_string)
-    await client.send_message(discord.Object(id='549667908884889602'), message_string)
-  elif(message.author != client.user and not message.channel.name):
-    print(message.author.name + " said: \"" + message.content + "\" privately")
-  await pre_add_reaction(message)
-  if(mess_with_kevin and message.author.id == id_kevin and (message.content.startswith('!') or message.content.startswith('/'))):
-    await client.send_message(message.author, 'Command not recognized. Please try again.')
-    await client.send_message(message.author, '!downvote <@!' + id_kevin + '>')
-    await client.delete_message(message)
-    return 0
-  if(message.author != client.user and message.channel.name):
-    await timecard_reminder(message)
-  if(message.channel.id == id_count):
-    await count_audit(message)
-  elif(message.content.lower() == ('!version')):
-    await client.send_message(message.channel if message.channel.name else message.author, 'Version: ' + version)
-  elif(message.content.startswith('!status')):
-    await client.send_message(message.channel, 'I am here')
-  elif(message.content.startswith(help.TRIGGER)):
-    await help.command(client, message)
-  elif(message.content.startswith('!ping')):
-    await ping_command(message)
-  elif(message.content.startswith('!stopvoice')):
-    if(message.author.id == id_branden):
-      await stop_voice(message)
-  elif(message.content.startswith('/r/')):
-    await reddit_link(message)
-  elif(message.content.startswith('/')):
-    await giphy_command(message.content, message.author, message)
-  elif(message.content.startswith('!clean')):
-    await clean_command(message)
-  elif(message.content.startswith('!pizza')):
-    await client.send_message(message.channel, 'Pizza? Who\'s paying for this? Not me.')
-  elif(message.content.startswith('!downvote')):
-    await vote_command(message, 'down')
-  elif(message.content.startswith('!upvote')):
-    await vote_command(message, 'up')
-  elif(message.content.startswith('!votes')):
-    await vote_command(message, 'display')
-  elif(message.content.lower() == '!lunchtime' or message.content.lower() == '!lunch'):
-    await lunch_command(message)
-  elif(message.content.startswith('!Mark')):
-    await mark_command(message)
-  elif(message.content.startswith('!sendMessage')):
-    await client.send_message(discord.Object(id=id_general), message.content[12:])
-  elif(message.content.lower().startswith('i\'m')):
-    if(' ' not in message.content[4:]):
-      await client.send_message(message.channel if message.channel.name else message.author, "Hi " + message.content[4:] + ", I\'m Roboto.")
-  elif(message.content.lower().startswith('!friday')):
-    await friday_command(message)
-  elif(message.content.lower().startswith('!emojify')):
-    await emojify_command(message)
-  elif(message.content.lower().startswith('!setlunch')):
-    await set_lunch_command(message)
-  elif(message.content.lower().startswith('!setfoos')):
-    await set_foos_command(message)
-  elif(message.content.lower().startswith('!foos')):
-    await foos_command(message)
-  elif(message.content.lower().startswith('!google')):
-    await google_command(message)
-  elif(message.content.lower() == single_giphy_results_display.TRIGGER):
-    await single_giphy_results_display.command(client, message, message.channel if message.channel.name else message.author, delete_message)
-  elif(message.content.lower() == 'lol'):
-    await client.send_message(message.channel if message.channel.name else message.author, 'lo\nlo\nlol')
-  elif(message.content.lower() == ('!messwithkevin')):
-    if (message.author.id == id_branden):
-      mess_with_kevin = not mess_with_kevin
-      await client.send_message(message.channel if message.channel.name else message.author, 'Mess with kevin = ' + str(mess_with_kevin))
-  elif(message.content.lower().startswith(weather.TRIGGER)):
-    await weather.command(client, message, message.channel if message.channel.name else message.author, delete_message, weather_cache, weather_api_key)
-  elif(message.content.startswith('!voice')):
-    if(message.author.id == id_branden): # only users in this if can use this command
-      if(len(message.content) < len('!voice ')):
-        await client.send_message(message.channel, 'Please provide a voice channel id')
-        return
-      channelId = message.content[len('!voice '):]
-      await client.send_message(message.channel, 'Joining voice channel with\nID: ' + channelId +'\nName: ' + client.get_channel(channelId).name)
-      await join_voice(channelId)
-      print("Joined voice channel with Id")
-    else:
-      count = 0
-      await client.send_message(message.channel, "Sorry, you do not have permission to use this command. Please contact Nibikk if you have any questions.") #Change this line to yourself or simply "Bot Admin"
+  try:
+    if(message.channel.name == 'logs'):
+      return 0
+    global mess_with_kevin
+    if(message.author != client.user and message.channel.name):
+      message_string = (message.author.name + " said : \"" + message.content + "\" in #" + message.channel.name + " @ " + time.ctime())
+      print(message_string)
+      await client.send_message(discord.Object(id='549667908884889602'), message_string)
+    elif(message.author != client.user and not message.channel.name):
+      print(message.author.name + " said: \"" + message.content + "\" privately")
+    await pre_add_reaction(message)
+    if(mess_with_kevin and message.author.id == id_kevin and (message.content.startswith('!') or message.content.startswith('/'))):
+      await client.send_message(message.author, 'Command not recognized. Please try again.')
+      await client.send_message(message.author, '!downvote <@!' + id_kevin + '>')
+      await client.delete_message(message)
+      return 0
+    if(message.author != client.user and message.channel.name):
+      await timecard_reminder(message)
+    if(message.channel.id == id_count):
+      await count_audit(message)
+    elif(message.content.lower() == ('!version')):
+      await client.send_message(message.channel if message.channel.name else message.author, 'Version: ' + version)
+    elif(message.content.startswith('!status')):
+      await client.send_message(message.channel, 'I am here')
+    elif(message.content.startswith(help.TRIGGER)):
+      await help.command(client, message)
+    elif(message.content.startswith('!ping')):
+      await ping_command(message)
+    elif(message.content.startswith('!stopvoice')):
+      if(message.author.id == id_branden):
+        await stop_voice(message)
+    elif(message.content.startswith('/r/')):
+      await reddit_link(message)
+    elif(message.content.startswith('/')):
+      await giphy_command(message.content, message.author, message)
+    elif(message.content.startswith('!clean')):
+      await clean_command(message)
+    elif(message.content.startswith('!pizza')):
+      await client.send_message(message.channel, 'Pizza? Who\'s paying for this? Not me.')
+    elif(message.content.startswith('!downvote')):
+      await vote_command(message, 'down')
+    elif(message.content.startswith('!upvote')):
+      await vote_command(message, 'up')
+    elif(message.content.startswith('!votes')):
+      await vote_command(message, 'display')
+    elif(message.content.lower() == '!lunchtime' or message.content.lower() == '!lunch'):
+      await lunch_command(message)
+    elif(message.content.startswith('!Mark')):
+      await mark_command(message)
+    elif(message.content.startswith('!sendMessage')):
+      await client.send_message(discord.Object(id=id_general), message.content[12:])
+    elif(message.content.lower().startswith('i\'m')):
+      if(' ' not in message.content[4:]):
+        await client.send_message(message.channel if message.channel.name else message.author, "Hi " + message.content[4:] + ", I\'m Roboto.")
+    elif(message.content.lower().startswith('!friday')):
+      await friday_command(message)
+    elif(message.content.lower().startswith('!emojify')):
+      await emojify_command(message)
+    elif(message.content.lower().startswith('!setlunch')):
+      await set_lunch_command(message)
+    elif(message.content.lower().startswith('!setfoos')):
+      await set_foos_command(message)
+    elif(message.content.lower().startswith('!foos')):
+      await foos_command(message)
+    elif(message.content.lower().startswith('!google')):
+      await google_command(message)
+    elif(message.content.lower() == single_giphy_results_display.TRIGGER):
+      await single_giphy_results_display.command(client, message, message.channel if message.channel.name else message.author, delete_message)
+    elif(message.content.lower() == 'lol'):
+      await client.send_message(message.channel if message.channel.name else message.author, 'lo\nlo\nlol')
+    elif(message.content.lower() == ('!messwithkevin')):
+      if (message.author.id == id_branden):
+        mess_with_kevin = not mess_with_kevin
+        await client.send_message(message.channel if message.channel.name else message.author, 'Mess with kevin = ' + str(mess_with_kevin))
+    elif(message.content.lower().startswith(weather.TRIGGER)):
+      await weather.command(client, message, message.channel if message.channel.name else message.author, delete_message, weather_cache, weather_api_key)
+    elif(message.content.startswith('!voice')):
+      if(message.author.id == id_branden): # only users in this if can use this command
+        if(len(message.content) < len('!voice ')):
+          await client.send_message(message.channel, 'Please provide a voice channel id')
+          return
+        channelId = message.content[len('!voice '):]
+        await client.send_message(message.channel, 'Joining voice channel with\nID: ' + channelId +'\nName: ' + client.get_channel(channelId).name)
+        await join_voice(channelId)
+        print("Joined voice channel with Id")
+      else:
+        count = 0
+        await client.send_message(message.channel, "Sorry, you do not have permission to use this command. Please contact Nibikk if you have any questions.") #Change this line to yourself or simply "Bot Admin"
+  except Exception as e:
+    await client.send_message(discord.Object(id='549667908884889602'), e)
 client.run(discordApiKey)
