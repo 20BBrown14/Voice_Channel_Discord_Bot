@@ -2,17 +2,28 @@
 
 import os
 
+async def print_results(client, message, channel, single_results, count):
+  await client.send_message(channel, "Number of results = %d" % (count))
+  for string in single_results:
+    if len(string) > 0:
+      await client.send_message(channel, "```\n%s```" % string[:-2])
+
 async def command(client, message, channel, delete_message):
-  single_results = []
+  single_results_array = []
+  single_results_string = ''
+  single_results_count = 0
   if(os.path.isfile('single_giphy_results.txt')):
     with open('single_giphy_results.txt') as f:
       for line in f:
-        single_results.append(line.rstrip())
-  else:
-    await client.send_message(message.author, "There are no single results yet")
-
-  if(len(single_results) > 0 ):
-    await client.send_message(channel, "```\nNumber of results = %d\n%s```" % (len(single_results), ', '.join(single_results)))
+        if(len(single_results_string) + len(line.rstrip() + ', ') < 2000):
+          single_results_string = single_results_string + line.rstrip() + ', '
+          single_results_count += 1
+        else:
+          single_results_array.append(single_results_string)
+          single_results_string = '' + line.rstrip() + ', '
+          single_results_count += 1
+      single_results_array.append(single_results_string)
+    await print_results(client, message, channel, single_results_array, single_results_count)
   else:
     await client.send_message(message.author, "There are no single results yet")
 
