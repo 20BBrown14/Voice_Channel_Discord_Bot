@@ -56,7 +56,7 @@ id_count           = '540194885865832518'
 # Update for each revision using format yyyy-mm-dd_#
 # where '#' is the release number for that day.
 # e.g. 2019-03-31_1 is the first relase of March 1st, 2019
-version = '2019-04-02_1'
+version = '2019-04-02_2'
 
 client = Client()
 
@@ -173,7 +173,7 @@ async def giphy_command(messageContent, author, message):
       f = open('single_giphy_results.txt', 'r')
       file_contents = f.read()
       f.close()
-      if(not messageContent[1:] in file_contents):
+      if(not messageContent[1:].lower() in file_contents.lower()):
         f = open("single_giphy_results.txt", "a")
         f.write(messageContent[1:] + '\n')
         f.close()
