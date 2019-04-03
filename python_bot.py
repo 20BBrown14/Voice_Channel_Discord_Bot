@@ -56,7 +56,7 @@ id_count           = '540194885865832518'
 # Update for each revision using format yyyy-mm-dd_#
 # where '#' is the release number for that day.
 # e.g. 2019-03-31_1 is the first release of March 31st, 2019
-version = '2019-04-03_1'
+version = '2019-04-03_2'
 
 client = Client()
 
@@ -196,9 +196,9 @@ async def giphy_command(messageContent, author, message):
       displayName = author.name
     if(len(data["data"]) == 1):
       if(new_result):
-        await client.send_message(message.channel, "%s ' \'%s\' by %s with %s result. Single result added." % (url[1:len(url)-1], messageContent[1:], displayName, str(len(data["data"]))))
+        await client.send_message(message.channel, "%s \'%s\' by %s with %s result. Single result added." % (url[1:len(url)-1], messageContent[1:], displayName, str(len(data["data"]))))
       else:
-        await client.send_message(message.channel, "%s ' \'%s\' by %s with %s result. Single result not added." % (url[1:len(url)-1], messageContent[1:], displayName, str(len(data["data"]))))
+        await client.send_message(message.channel, "%s \'%s\' by %s with %s result. Single result not added." % (url[1:len(url)-1], messageContent[1:], displayName, str(len(data["data"]))))
     else:
       await client.send_message(message.channel, url[1:len(url)-1] + ' \'' + messageContent[1:] + '\' by ' + displayName + ' with ' + str(len(data["data"])) + ' results')
   if(message and message.channel.name):
