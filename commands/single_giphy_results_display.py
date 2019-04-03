@@ -6,6 +6,8 @@ async def print_results(client, message, channel, single_results, count):
   await client.send_message(channel, "Number of results = %d" % (count))
   for string in single_results:
     if len(string) > 0:
+      print(len(string))
+      print(string)
       await client.send_message(channel, "```\n%s```" % string[:-2])
 
 async def command(client, message, channel, delete_message):
@@ -15,7 +17,7 @@ async def command(client, message, channel, delete_message):
   if(os.path.isfile('single_giphy_results.txt')):
     with open('single_giphy_results.txt') as f:
       for line in f:
-        if(len(single_results_string) + len(line.rstrip() + ', ') < 2000):
+        if(len(single_results_string) + len(line.rstrip() + ', ') < 1950):
           single_results_string = single_results_string + line.rstrip() + ', '
           single_results_count += 1
         else:

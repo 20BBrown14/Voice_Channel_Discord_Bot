@@ -55,8 +55,8 @@ id_count           = '540194885865832518'
 
 # Update for each revision using format yyyy-mm-dd_#
 # where '#' is the release number for that day.
-# e.g. 2019-03-31_1 is the first relase of March 1st, 2019
-version = '2019-04-02_5'
+# e.g. 2019-03-31_1 is the first release of March 31st, 2019
+version = '2019-04-03_1'
 
 client = Client()
 
@@ -168,12 +168,16 @@ async def giphy_command(messageContent, author, message):
       search_params_sb = search_params_sb + search_params[len(search_params_sb):i] + '+'
   search_params_sb = search_params_sb + search_params[len(search_params_sb):]
   data = json.loads((urllib.request.urlopen('http://api.giphy.com/v1/gifs/search?q='+search_params_sb+'&api_key=' + str(giphyApiKey) + '&limit=100').read()).decode('utf-8'))
+  new_result = True
   if(len(data["data"]) == 1):
+    single_result = messageContent[1:].lower()
     if(os.path.isfile('single_giphy_results.txt')):
-      f = open('single_giphy_results.txt', 'r')
-      file_contents = f.read()
-      f.close()
-      if(not messageContent[1:].lower() in file_contents.lower()):
+      with open('single_giphy_results.txt') as f:
+        for line in f:
+          if(single_result == line.rstrip().lower()):
+            new_result = False
+            break
+      if(new_result):
         f = open("single_giphy_results.txt", "a")
         f.write(messageContent[1:] + '\n')
         f.close()
@@ -190,7 +194,13 @@ async def giphy_command(messageContent, author, message):
       displayName = author.nick
     else:
       displayName = author.name
-    await client.send_message(message.channel, url[1:len(url)-1] + ' \'' + messageContent[1:] + '\' by ' + displayName + ' with ' + str(len(data["data"])) + ' results')
+    if(len(data["data"]) == 1):
+      if(new_result):
+        await client.send_message(message.channel, "%s ' \'%s\' by %s with %s result. Single result added." % (url[1:len(url)-1], messageContent[1:], displayName, str(len(data["data"]))))
+      else:
+        await client.send_message(message.channel, "%s ' \'%s\' by %s with %s result. Single result not added." % (url[1:len(url)-1], messageContent[1:], displayName, str(len(data["data"]))))
+    else:
+      await client.send_message(message.channel, url[1:len(url)-1] + ' \'' + messageContent[1:] + '\' by ' + displayName + ' with ' + str(len(data["data"])) + ' results')
   if(message and message.channel.name):
     await client.delete_message(message)
 
