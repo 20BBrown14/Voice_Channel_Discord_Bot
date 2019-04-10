@@ -651,7 +651,7 @@ async def on_message(message):
       mess_with_kevin = not mess_with_kevin
       await client.send_message(message.channel if message.channel.name else message.author, 'Mess with kevin = ' + str(mess_with_kevin))
   elif(message.content.lower() == '!limitsearchestoggle'):
-    limit_giphy_searches = False
+    limit_giphy_searches = not limit_giphy_searches
     await client.send_message(message.author, 'Search limit has been toggled %s' % str(limit_giphy_searches))
   elif(message.content.lower().startswith(weather.TRIGGER)):
     await weather.command(client, message, message.channel if message.channel.name else message.author, delete_message, weather_cache, weather_api_key)
