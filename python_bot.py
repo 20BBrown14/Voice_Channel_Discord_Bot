@@ -35,6 +35,8 @@ global foos_time
 global mess_with_kevin
 global thirtyMinWarning
 global weather_cache
+global last_giphy_search
+global limit_giphy_searches
 
 #from config.py file
 discordApiKey = config.bot_token 
@@ -56,7 +58,7 @@ id_count           = '540194885865832518'
 # Update for each revision using format yyyy-mm-dd_#
 # where '#' is the release number for that day.
 # e.g. 2019-03-31_1 is the first release of March 31st, 2019
-version = '2019-04-09_1'
+version = '2019-04-10_1'
 
 client = Client()
 
@@ -153,6 +155,14 @@ def textToWav(text, file_name):
   print("File written")
 
 async def giphy_command(messageContent, author, message):
+  global last_giphy_search
+  global limit_giphy_searches
+  now = datetime.datetime.now().timestamp()
+  if(limit_giphy_searches and now - last_giphy_search < 10):
+    await client.delete_message(message)
+    await client.send_message(message.author, 'Too many giphy searches server wide. You can search again in %d seconds' % int(10-(now-last_giphy_search)))
+    return
+  last_giphy_search = now
   forbidden_gifs = ['/gamerescape', '/xivdb', '/giphy', '/tts', '/tenor', '/me', '/tableflip', '/unflip', '/shrug', '/nick']
   spaceIndex = messageContent.find(' ')
   if spaceIndex != -1 and messageContent[:spaceIndex] in forbidden_gifs:
@@ -543,6 +553,8 @@ async def on_ready():
     global mess_with_kevin
     global thirtyMinWarning
     global weather_cache
+    global last_giphy_search
+    global limit_giphy_searches
     print('Logged in as')
     print(client.user.name)
     print(client.user.id)
@@ -558,6 +570,8 @@ async def on_ready():
     thirtyMinWarning = False
     client_game = discord.Game(name='Goosball v%s' % version)
     weather_cache = json.loads('{}')
+    last_giphy_search = 0
+    limit_giphy_searches = True
     await client.change_status(game = client_game)
 
 @client.event
@@ -565,6 +579,7 @@ async def on_message(message):
   if(message.channel.name == 'logs'):
     return 0
   global mess_with_kevin
+  global limit_giphy_searches
   if(message.author != client.user and message.channel.name):
     message_string = (message.author.name + " said : \"" + message.content + "\" in #" + message.channel.name + " @ " + time.ctime())
     print(message_string)
@@ -635,6 +650,9 @@ async def on_message(message):
     if (message.author.id == id_branden):
       mess_with_kevin = not mess_with_kevin
       await client.send_message(message.channel if message.channel.name else message.author, 'Mess with kevin = ' + str(mess_with_kevin))
+  elif(message.content.lower() == '!limitsearchestoggle'):
+    limit_giphy_searches = False
+    await client.send_message(message.author, 'Search limit has been toggled %s' % str(limit_giphy_searches))
   elif(message.content.lower().startswith(weather.TRIGGER)):
     await weather.command(client, message, message.channel if message.channel.name else message.author, delete_message, weather_cache, weather_api_key)
   elif(message.content.startswith('!voice')):
