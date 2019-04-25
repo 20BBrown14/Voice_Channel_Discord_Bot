@@ -529,7 +529,7 @@ async def google_command(message):
       modifiedSearchString += c
   try:
     shortener = Shortener('Tinyurl')
-    await client.send_message(message.channel if message.channel.name else message.author, shortener.short(lmgtfyPrefix + modifiedSearchString))
+    await client.send_message(message.channel if message.channel.name else message.author, '<%s>' % shortener.short(lmgtfyPrefix + modifiedSearchString))
   except:
     await client.send_message(message.author, 'Something went wrong shortening the URL. Here is the raw link: ' + lmgtfyPrefix + modifiedSearchString)
   await client.delete_message(message)

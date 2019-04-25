@@ -63,11 +63,20 @@ def create_embeded(title, description, icon, min_temp, max_temp, current_temp, h
     embed.add_field(name='Snow', value=snow, inline=True)
   return embed
 
-def update_cache(zipcode, item, weather_cache):
-  now = datetime.datetime.now().timestamp()
-  item['cached_time'] = now
-  weather_cache[zipcode] = item
-  return weather_cache
+def update_cache(option, zipcode, item, weather_cache):
+  if(option == 'forecast'):
+    if(not 'forecast' in weather_cache):
+      weather_cache['forecast'] = json.loads('{}')
+    now = datetime.datetime.now().timestamp()
+    item['cached_time'] = now
+    weather_cache['forecast'][zipcode] = item
+    return weather_cache
+
+  if(option == ''):
+    now = datetime.datetime.now().timestamp()
+    item['cached_time'] = now
+    weather_cache[zipcode] = item
+    return weather_cache
 
 """
 Weather command
@@ -86,48 +95,93 @@ async def command(client, message, channel, delete_message, weather_cache, weath
   await delete_message(client, message)
 
   message_content = message.content[9:]
-  equals_index = message_content.find('=')
-
-  if(equals_index < 0): #option not provided
-    if(message_content.strip() == 'help'): #weather help command invoked
-      await client.send_message(message.author, "%s" % weather_help())
-      return
-    await client.send_message(message.author, "Please ensure you're using one of the follow options:\n%s" % weather_help())
-    return
-    
-  if(message_content[:equals_index].strip().lower() == 'zip'):
-    zipcode = message_content[equals_index+1:].strip()
-    now = datetime.datetime.now().timestamp()
-    weather_data = None
-    if(zipcode in weather_cache and now - weather_cache[zipcode]['cached_time'] < 600):
-      weather_data = weather_cache[zipcode]
-    else:
-      url = "http://api.openweathermap.org/data/2.5/weather?zip=%s&APPID=%s" % (zipcode, weather_api_key)
-      response = requests.get(url).text
-      weather_data = json.loads(response)
-      weather_cache = update_cache(zipcode, weather_data, weather_cache)
-    if(weather_data['cod'] == 200):
-      weather = weather_data["weather"][0] if 'weather' in weather_data else []
-      main = weather_data["main"] if 'main' in weather_data else []
-      wind = weather_data["wind"] if 'wind' in weather_data else []
-      rain = weather_data["rain"] if 'rain' in weather_data else []
-      snow = weather_data["snow"] if 'snow' in weather_data else []
-      weather_embeded = create_embeded(zipcode, \
-                                      "%s / %s" % (weather['main'], weather['description']) if 'main' in weather and 'description' in weather else 'Weather', \
-                                      weather["icon"] if 'icon' in weather else False, \
-                                      kelvin_to_C_and_F_string(main["temp_min"]) if 'temp_min' in main else False, \
-                                      kelvin_to_C_and_F_string(main["temp_max"]) if 'temp_max' in main else False, \
-                                      kelvin_to_C_and_F_string(main["temp"]) if 'temp' in main else False, \
-                                      main["humidity"] if 'humidity' in main else 'N/A', \
-                                      meter_per_sec_to_mph(wind['speed']) if 'speed' in wind else False, \
-                                      wind['deg'] if 'deg' in wind else False, \
-                                      degree_to_cardinal_direction(wind['deg']) if 'deg' in wind else False, \
-                                      precip_string(rain), \
-                                      precip_string(snow) \
-                                    )
-      await client.send_message(channel, embed=weather_embeded)
+  arguments = message_content.split(' ')
+  if(arguments[0].strip().lower() == 'forecast'):
+    weather_options = message.content[18:]
+    equals_index = weather_options.find('=')
+    if(equals_index < 0):
+      if(message_content.strip() == 'help'):
+        await client.send_message(message.author, "%s" % weather_help())
+        return weather_cache
+      await client.send_message(message.author, "Please ensure you're using one of the following options:\n%s" % weather_help())
       return weather_cache
-    else:
-      await client.send_message(message.author, weather_cache['message'])
+    if(weather_options[:equals_index].strip().lower() == 'zip'):
+      zipcode = weather_options[equals_index+1:].strip()
+      now = datetime.datetime.now().timestamp()
+      weather_data = None
+      if('forecast' in weather_cache and zipcode in weather_cache['forecast'] and now - weather_cache['forecast'][zipcode]['cached_time'] < 600):
+        weather_data = weather_cache['forecast'][zipcode]
+      else:
+        url = "http://api.openweathermap.org/data/2.5/forecast?zip=%s&APPID=%s" % (zipcode, weather_api_key)
+        response = requests.get(url).text
+        weather_data = json.loads(response)
+        weather_cache = update_cache('forecast', zipcode, weather_data, weather_cache)
+      if('cod' in weather_data and weather_data['cod'] == '200'):
+        now = datetime.datetime.now().timestamp()
+        if('list' in weather_data):
+          for forecast in weather_data['list']:
+            if('dt' in forecast):
+              forecast_time = forecast['dt']
+              time_diff = forecast_time - now
+              minutes = time_diff // 60 % 60
+              hours = time_diff // 3600 % 24
+              days = time_diff // 86400
+              print(days, hours, minutes)
+            else:
+              await client.send_message(message.author, 'Something went wrong. Sorry about that. Please try again in 10 minutes.')
+              return weather_cache
+        else:
+          await client.send_message(message.author, 'Something went wrong. Sorry about that. Please try again in 10 minutes.')
+          return weather_cache
+      else:
+        await client.send_message(message.author, weather_data['message'])
+        return weather_cache
+
+
+  elif(arguments[1].strip().lower().contains('zip')):
+    equals_index = message_content.find('=')
+    if(equals_index < 0): #option not provided
+      if(message_content.strip() == 'help'): #weather help command invoked
+        await client.send_message(message.author, "%s" % weather_help())
+        return weather_cache
+      await client.send_message(message.author, "Please ensure you're using one of the following options:\n%s" % weather_help())
+      return weather_cache
+      
+    if(message_content[:equals_index].strip().lower() == 'zip'):
+      zipcode = message_content[equals_index+1:].strip()
+      now = datetime.datetime.now().timestamp()
+      weather_data = None
+      if(zipcode in weather_cache and now - weather_cache[zipcode]['cached_time'] < 600):
+        weather_data = weather_cache[zipcode]
+      else:
+        url = "http://api.openweathermap.org/data/2.5/weather?zip=%s&APPID=%s" % (zipcode, weather_api_key)
+        response = requests.get(url).text
+        weather_data = json.loads(response)
+        weather_cache = update_cache('', zipcode, weather_data, weather_cache)
+      if('cod' in weather_data and weather_data['cod'] == 200):
+        weather = weather_data["weather"][0] if 'weather' in weather_data else []
+        main = weather_data["main"] if 'main' in weather_data else []
+        wind = weather_data["wind"] if 'wind' in weather_data else []
+        rain = weather_data["rain"] if 'rain' in weather_data else []
+        snow = weather_data["snow"] if 'snow' in weather_data else []
+        weather_embeded = create_embeded(zipcode, \
+                                        "%s / %s" % (weather['main'], weather['description']) if 'main' in weather and 'description' in weather else 'Weather', \
+                                        weather["icon"] if 'icon' in weather else False, \
+                                        kelvin_to_C_and_F_string(main["temp_min"]) if 'temp_min' in main else False, \
+                                        kelvin_to_C_and_F_string(main["temp_max"]) if 'temp_max' in main else False, \
+                                        kelvin_to_C_and_F_string(main["temp"]) if 'temp' in main else False, \
+                                        main["humidity"] if 'humidity' in main else 'N/A', \
+                                        meter_per_sec_to_mph(wind['speed']) if 'speed' in wind else False, \
+                                        wind['deg'] if 'deg' in wind else False, \
+                                        degree_to_cardinal_direction(wind['deg']) if 'deg' in wind else False, \
+                                        precip_string(rain), \
+                                        precip_string(snow) \
+                                      )
+        await client.send_message(channel, embed=weather_embeded)
+        return weather_cache
+      else:
+        await client.send_message(message.author, weather_data['message'])
+  else:
+    await client.send_message(message.author, "%s" % weather_help())
 
 TRIGGER = '!weather'
