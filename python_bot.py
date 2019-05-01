@@ -58,7 +58,7 @@ id_count           = '540194885865832518'
 # Update for each revision using format yyyy-mm-dd_#
 # where '#' is the release number for that day.
 # e.g. 2019-03-31_1 is the first release of March 31st, 2019
-version = '2019-04-10_2'
+version = '2019-04-30_2'
 
 client = Client()
 
@@ -592,8 +592,8 @@ async def on_message(message):
     await client.send_message(message.author, '!downvote <@!' + id_kevin + '>')
     await client.delete_message(message)
     return 0
-  if(message.author != client.user and message.channel.name):
-    await timecard_reminder(message)
+  # if(message.author != client.user and message.channel.name):
+    # await timecard_reminder(message)
   if(message.channel.id == id_count):
     await count_audit(message)
   elif(message.content.lower() == ('!version')):
