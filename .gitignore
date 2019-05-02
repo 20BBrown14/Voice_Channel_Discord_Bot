@@ -9,3 +9,5 @@ config.py
 pythonUpdateGit.py
 *.swp
 single_giphy_results.txt
+Harry Potter.7z
+Harry_Potter/**
