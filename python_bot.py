@@ -19,10 +19,11 @@ import threading
 from threading import Timer
 import time
 import urllib.request
+import globals_file
 
 # local file imports
 import config
-from commands import help, weather, single_giphy_results_display
+from commands import help, weather, single_giphy_results_display, harry_potter
 
 global player
 global voice_client
@@ -573,6 +574,7 @@ async def on_ready():
     last_giphy_search = 0
     limit_giphy_searches = True
     await client.change_status(game = client_game)
+    globals_file.init()
 
 @client.event
 async def on_message(message):
@@ -655,6 +657,14 @@ async def on_message(message):
     await client.send_message(message.author, 'Search limit has been toggled %s' % str(limit_giphy_searches))
   elif(message.content.lower().startswith(weather.TRIGGER)):
     await weather.command(client, message, message.channel if message.channel.name else message.author, delete_message, weather_cache, weather_api_key)
+  elif(message.content.lower().startswith(harry_potter.TRIGGER_PAUSE)):
+    await harry_potter.command(client, message, message.channel if message.channel.name else message.author, delete_message, 'pause')
+  elif(message.content.lower().startswith(harry_potter.TRIGGER_STOP)):
+    await harry_potter.command(client, message, message.channel if message.channel.name else message.author, delete_message, 'stop')
+  elif(message.content.lower().startswith(harry_potter.TRIGGER_RESUME)):
+    await harry_potter.command(client, message, message.channel if message.channel.name else message.author, delete_message, 'resume')
+  elif(message.content.lower().startswith(harry_potter.TRIGGER_BEGIN)):
+    await harry_potter.command(client, message, message.channel if message.channel.name else message.author, delete_message, 'begin')
   elif(message.content.startswith('!voice')):
     if(message.author.id == id_branden): # only users in this if can use this command
       if(len(message.content) < len('!voice ')):
