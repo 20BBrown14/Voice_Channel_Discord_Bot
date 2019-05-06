@@ -111,7 +111,7 @@ async def command(client, message, channel, delete_message, player_change):
 
     HP_Books = []
 
-    for root, dirs, files in os.walk('Harry_Potter'):
+    for root, dirs, files in os.walk('/mnt/USB/Harry_Potter/Harry_Potter'):
       for folder in dirs:
           HP_Books.append(os.path.join(root, folder))
 
