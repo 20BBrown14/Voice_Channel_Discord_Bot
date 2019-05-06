@@ -121,7 +121,7 @@ async def command(client, message, channel, delete_message, player_change):
     globals_file.voice_client = voice
 
     for book in HP_Books: #13
-      if(start_file_path != '' and int(book[13]) < int(start_file_path[13])):
+      if(start_file_path != '' and int(book[35]) < int(start_file_path[13])):
         continue
       audio_files = []
       for root, dirs, files in os.walk(book):
@@ -131,7 +131,7 @@ async def command(client, message, channel, delete_message, player_change):
             dot_index = chapter_and_part.find('.')
             chapter_number = chapter_and_part[:dot_index]
             part_number = chapter_and_part[dot_index+1:dot_index+3]
-            if(start_file_path != '' and int(book[13]) == int(start_file_path[13])):
+            if(start_file_path != '' and int(book[35]) == int(start_file_path[13])):
               if(int(chapter_number) == int(chapter)):
                 if(int(part_number) >= int(part)):
                   audio_files.append(os.path.join(root, some_file))
