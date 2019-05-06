@@ -59,7 +59,7 @@ id_count           = '540194885865832518'
 # Update for each revision using format yyyy-mm-dd_#
 # where '#' is the release number for that day.
 # e.g. 2019-03-31_1 is the first release of March 31st, 2019
-version = '2019-05-02_1'
+version = '2019-05-06_1'
 
 client = Client()
 
