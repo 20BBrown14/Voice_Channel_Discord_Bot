@@ -120,7 +120,7 @@ async def command(client, message, channel, delete_message, player_change):
     voice = await client.join_voice_channel(voice_channel)
     globals_file.voice_client = voice
 	
-	HP_Books.sort()
+    HP_Books.sort()
 
     for book in HP_Books: #13
       if(start_file_path != '' and int(book[35]) < int(start_file_path[13])):
