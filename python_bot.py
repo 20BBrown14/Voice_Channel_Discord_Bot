@@ -59,7 +59,7 @@ id_count           = '540194885865832518'
 # Update for each revision using format yyyy-mm-dd_#
 # where '#' is the release number for that day.
 # e.g. 2019-03-31_1 is the first release of March 31st, 2019
-version = '2019-05-13_1'
+version = '2019-05-13_2'
 
 client = Client()
 
@@ -644,7 +644,7 @@ async def on_message(message):
     await foos_command(message)
   elif(message.content.lower().startswith('!google')):
     await google_command(message)
-  elif(message.content.lower() == single_giphy_results_display.TRIGGER):
+  elif(message.content.startswith(single_giphy_results_display.TRIGGER)):
     await single_giphy_results_display.command(client, message, message.channel if message.channel.name else message.author, delete_message)
   elif(message.content.lower() == 'lol'):
     await client.send_message(message.channel if message.channel.name else message.author, 'lo\nlo\nlol')
