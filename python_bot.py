@@ -38,6 +38,7 @@ global thirtyMinWarning
 global weather_cache
 global last_giphy_search
 global limit_giphy_searches
+global giphy_file_contents
 
 #from config.py file
 discordApiKey = config.bot_token 
@@ -59,7 +60,7 @@ id_count           = '540194885865832518'
 # Update for each revision using format yyyy-mm-dd_#
 # where '#' is the release number for that day.
 # e.g. 2019-03-31_1 is the first release of March 31st, 2019
-version = '2019-05-13_2'
+version = '2019-05-21_1'
 
 client = Client()
 
@@ -158,6 +159,7 @@ def textToWav(text, file_name):
 async def giphy_command(messageContent, author, message):
   global last_giphy_search
   global limit_giphy_searches
+  global giphy_file_contents
   now = datetime.datetime.now().timestamp()
   if(limit_giphy_searches and now - last_giphy_search < 10):
     await client.delete_message(message)
@@ -171,6 +173,9 @@ async def giphy_command(messageContent, author, message):
   elif spaceIndex == -1 and messageContent in forbidden_gifs:
     print("Returning due to forbidden gif search")
     return
+  if('\n' in message.content):
+    await client.send_message(message.author, "Forbidden search string used")
+    return
   search_params = messageContent[1:]
   search_params_sb = ""
   first = True
@@ -183,15 +188,31 @@ async def giphy_command(messageContent, author, message):
   if(len(data["data"]) == 1):
     single_result = messageContent[1:].lower()
     if(os.path.isfile('single_giphy_results.txt')):
-      with open('single_giphy_results.txt') as f:
-        for line in f:
-          if(single_result == line.rstrip().lower()):
+      if(giphy_file_contents == ''):
+        f = open('single_giphy_results.txt', 'r')
+        giphy_file_contents = f.read().split('\n')
+        f.close()
+        del giphy_file_contents[-1]
+        with open('single_giphy_results.txt') as f:
+          for line in f:
+            if(single_result == line.rstrip().lower()):
+              new_result = False
+              break
+        if(new_result):
+          f = open("single_giphy_results.txt", "a")
+          f.write(messageContent[1:] + '\n')
+          f.close()
+          giphy_file_contents.append(messageContent[1:])
+      else:
+        for search in giphy_file_contents:
+          if(single_result == search.rstrip().lower()):
             new_result = False
             break
-      if(new_result):
-        f = open("single_giphy_results.txt", "a")
-        f.write(messageContent[1:] + '\n')
-        f.close()
+        if(new_result):
+          f = open('single_giphy_results.txt', 'a')
+          f.write(messageContent[1:] + '\n')
+          f.close()
+          giphy_file_contents.append(messageContent[1:])
     else:
       f = open("single_giphy_results.txt", 'w')
       f.write(messageContent[1:] + '\n')
@@ -556,6 +577,7 @@ async def on_ready():
     global weather_cache
     global last_giphy_search
     global limit_giphy_searches
+    global giphy_file_contents
     print('Logged in as')
     print(client.user.name)
     print(client.user.id)
@@ -575,6 +597,7 @@ async def on_ready():
     limit_giphy_searches = True
     await client.change_status(game = client_game)
     globals_file.init()
+    giphy_file_contents = ''
 
 @client.event
 async def on_message(message):
@@ -582,6 +605,7 @@ async def on_message(message):
     return 0
   global mess_with_kevin
   global limit_giphy_searches
+  global giphy_file_contents
   if(message.author != client.user and message.channel.name):
     message_string = (message.author.name + " said : \"" + message.content + "\" in #" + message.channel.name + " @ " + time.ctime())
     print(message_string)
@@ -645,7 +669,7 @@ async def on_message(message):
   elif(message.content.lower().startswith('!google')):
     await google_command(message)
   elif(message.content.startswith(single_giphy_results_display.TRIGGER)):
-    await single_giphy_results_display.command(client, message, message.channel if message.channel.name else message.author, delete_message)
+    await single_giphy_results_display.command(client, message, message.channel if message.channel.name else message.author, delete_message, giphy_file_contents)
   elif(message.content.lower() == 'lol'):
     await client.send_message(message.channel if message.channel.name else message.author, 'lo\nlo\nlol')
   elif(message.content.lower() == ('!messwithkevin')):
