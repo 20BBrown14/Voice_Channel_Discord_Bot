@@ -144,7 +144,7 @@ async def command(client, message, channel, delete_message, weather_cache, weath
       try:
         timezone = pytz.timezone('US/%s' % timezone)
       except pytz.exceptions.UnknownTimeZoneError: #unknown timezone error
-        await client.send_message(message.author, "Zipcode (%s) is in timezone %s and is not supported or invalid. Contact bot developer if you think this is in error." % zipcode, timezone)
+        await client.send_message(message.author, "Zipcode (%s) is in timezone %s and is not supported or invalid. Contact bot developer if you think this is in error." % (zipcode, timezone))
         return weather_cache
 
       await client.send_message(message.channel, "%s %s %s" % (city, state, timezone))
