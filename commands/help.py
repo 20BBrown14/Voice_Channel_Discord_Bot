@@ -26,7 +26,7 @@ async def command(client, message):
   My main purpose on this server is to announce when users leave or join the voice channel I am in.
   I am a little open source whore. See my birthday suit here: <https://github.com/20BBrown14/Voice_Channel_Discord_Bot>
   Vixxle is the creator of me, contact him if you have any questions.
-  Last updated 03/29/2019"""
+  Last updated 06/17/2019"""
   await client.send_message(channel, help_message)
   await client.delete_message(message)
 
