@@ -23,7 +23,7 @@ import globals_file
 
 # local file imports
 import config
-from commands import help, weather, single_giphy_results_display, harry_potter
+from commands import help, weather, single_giphy_results_display, harry_potter, define
 
 global player
 global voice_client
@@ -44,6 +44,8 @@ global giphy_file_contents
 discordApiKey = config.bot_token 
 giphyApiKey = config.giphy_api_key
 weather_api_key = config.weather_api_key
+dictionary_api = config.dictionary_api
+spanish_english_dictionary_api = config.spanish_english_api
 
 # User IDs
 id_branden = '159785058381725696'
@@ -689,6 +691,8 @@ async def on_message(message):
     await harry_potter.command(client, message, message.channel if message.channel.name else message.author, delete_message, 'resume')
   elif(message.content.lower().startswith(harry_potter.TRIGGER_BEGIN)):
     await harry_potter.command(client, message, message.channel if message.channel.name else message.author, delete_message, 'begin')
+  elif(message.content.lower().startswith(define.TRIGGER)):
+    await define.command(client, message, message.channel if message.channel.name else message.author, delete_message, dictionary_api)
   elif(message.content.startswith('!voice')):
     if(message.author.id == id_branden): # only users in this if can use this command
       if(len(message.content) < len('!voice ')):

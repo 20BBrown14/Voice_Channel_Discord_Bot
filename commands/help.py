@@ -21,6 +21,7 @@ async def command(client, message):
   < !votes >: Displays all votes
   < !lunchtime >: If it's 11:30AM it's lunch time!
   < !singleresults >: *Lists the single result searches from slash command*
+  < !define [word] >: *Returns definition for given word*
   < /[emote] >: Invoking a slash command will make me search for a relevant gif and then post it
   My main purpose on this server is to announce when users leave or join the voice channel I am in.
   I am a little open source whore. See my birthday suit here: <https://github.com/20BBrown14/Voice_Channel_Discord_Bot>
