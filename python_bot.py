@@ -622,7 +622,8 @@ async def on_message(message):
     await client.delete_message(message)
     return 0
   if(message.content.lower() == 'ope'):
-    await client.send_message(message.channel if message.channel.name else message.author, 'gottem')
+    gottem_array = ['gottem', 'gotem', 'gotm', 'gottum', 'gottm', 'gotm', 'gotim', 'gottim', 'oof', 'gotus', 'gottus']
+    await client.send_message(message.channel if message.channel.name else message.author, gottem_array[random.randint(0,len(gottem_array)-1)])
   if(message.author != client.user and message.channel.name):
     await timecard_reminder(message)
   if(message.channel.id == id_count):
