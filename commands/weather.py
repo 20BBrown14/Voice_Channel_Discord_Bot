@@ -46,6 +46,10 @@ def precip_string(precip):
   else:
     return False
 
+def average_out_number_array(array):
+  print(array)
+  return sum(array) / len(array)
+
 def create_embeded(title, description, icon, min_temp, max_temp, current_temp, humidity, wind_speed, wind_degrees, wind_direction, rain, snow):
   embed=discord.Embed(title="%s's Weather" % title, description="%s" % description, color=0x00f900)
   if(icon):
@@ -78,10 +82,10 @@ def create_forecast_embeded(title, description, first_day_times, first_day_temps
   for i in range(0, len(first_day_times)):
       date = datetime.datetime.fromtimestamp(first_day_times[i])
       embed.add_field(name="%s, %s" % (date, calendarList[date.weekday()]), value="%s | %s | %s%% humidity" % (first_day_conditions[i], kelvin_to_C_and_F_string(first_day_temps[i]), first_day_humidity[i]), inline=False)
-  embed.add_field(name="%s, %s" % (next_days[0].strftime("%Y-%m-%d"), calendarList[next_days[0].weekday()]), value="%s | %s | %s%% humidity" % (weather_conditions[0], kelvin_to_C_and_F_string(average_temps[0]), round(average_humidity[0], 2)), inline=False)
-  embed.add_field(name="%s, %s" % (next_days[1].strftime("%Y-%m-%d"), calendarList[next_days[1].weekday()]), value="%s | %s | %s%% humidity" % (weather_conditions[1], kelvin_to_C_and_F_string(average_temps[1]), round(average_humidity[1], 2)), inline=False)
-  embed.add_field(name="%s, %s" % (next_days[2].strftime("%Y-%m-%d"), calendarList[next_days[2].weekday()]), value="%s | %s | %s%% humidity" % (weather_conditions[2], kelvin_to_C_and_F_string(average_temps[2]), round(average_humidity[2], 2)), inline=False)
-  embed.add_field(name="%s, %s" % (next_days[3].strftime("%Y-%m-%d"), calendarList[next_days[3].weekday()]), value="%s | %s | %s%% humidity" % (weather_conditions[3], kelvin_to_C_and_F_string(average_temps[3]), round(average_humidity[3], 2)), inline=False)
+  embed.add_field(name="%s, %s (24 hours)" % (next_days[0].strftime("%Y-%m-%d"), calendarList[next_days[0].weekday()]), value="%s | %s | %s%% humidity" % (weather_conditions[0], kelvin_to_C_and_F_string(average_out_number_array(average_temps[0])), round(average_out_number_array(average_humidity[0]), 2)), inline=False)
+  embed.add_field(name="%s, %s (24 hours)" % (next_days[1].strftime("%Y-%m-%d"), calendarList[next_days[1].weekday()]), value="%s | %s | %s%% humidity" % (weather_conditions[1], kelvin_to_C_and_F_string(average_out_number_array(average_temps[1])), round(average_out_number_array(average_humidity[1]), 2)), inline=False)
+  embed.add_field(name="%s, %s (24 hours)" % (next_days[2].strftime("%Y-%m-%d"), calendarList[next_days[2].weekday()]), value="%s | %s | %s%% humidity" % (weather_conditions[2], kelvin_to_C_and_F_string(average_out_number_array(average_temps[2])), round(average_out_number_array(average_humidity[2]), 2)), inline=False)
+  embed.add_field(name="%s, %s (24 hours)" % (next_days[3].strftime("%Y-%m-%d"), calendarList[next_days[3].weekday()]), value="%s | %s | %s%% humidity" % (weather_conditions[3], kelvin_to_C_and_F_string(average_out_number_array(average_temps[3])), round(average_out_number_array(average_humidity[3]), 2)), inline=False)
   return embed
 
 def find_zip_info(zipcode):
@@ -160,9 +164,9 @@ async def command(client, message, channel, delete_message, weather_cache, weath
         weather_cache = update_cache('forecast', zipcode, weather_data, weather_cache)
       
       first_forecast_time = None
-      average_temps = [0, 0, 0, 0]
+      average_temps = [[], [], [], []]
       weather_condition = ['', '', '', '']
-      humidity_average = [0, 0, 0, 0]
+      humidity_average = [[], [], [], []]
       first_day_times = []
       first_day_temps = []
       first_day_conditions = []
@@ -183,34 +187,33 @@ async def command(client, message, channel, delete_message, weather_cache, weath
                 first_day_conditions.append(forecast['weather'][0]['description'])
                 first_day_humidity.append(forecast['main']['humidity'])
               elif(forecast['dt'] < first_forecast_time + (60 * 60 * 24 * 2)): #second 24 hours of forecast
-                average_temps[0] = (average_temps[0] + forecast['main']['temp']) / 2 if average_temps[0] != 0 else forecast['main']['temp']
+                average_temps[0].append(forecast['main']['temp'])
                 if(forecast['weather'][0]['main'] == 'Rain' or forecast['weather'][0]['main'] == 'Snow'):
                   weather_condition[0] = forecast['weather'][0]['description']
                 elif(weather_condition[0] == ''):
                   weather_condition[0] = forecast['weather'][0]['description']
-                humidity_average[0] = (humidity_average[0] + forecast['main']['humidity']) / 2 if humidity_average[0] != 0 else forecast['main']['humidity']
+                humidity_average[0].append(forecast['main']['humidity'])
               elif(forecast['dt'] < first_forecast_time + (60 * 60 * 24 * 3)): #third 24 hours of forecast
-                average_temps[1] = (average_temps[1] + forecast['main']['temp']) / 2 if average_temps[1] != 0 else forecast['main']['temp']
+                average_temps[1].append(forecast['main']['temp'])
                 if(forecast['weather'][0]['main'] == 'Rain' or forecast['weather'][0]['main'] == 'Snow'):
                   weather_condition[1] = forecast['weather'][0]['description']
                 elif(weather_condition[1] == ''):
                   weather_condition[1] = forecast['weather'][0]['description']
-                humidity_average[1] = (humidity_average[1] + forecast['main']['humidity']) / 2 if humidity_average[1] != 0 else forecast['main']['humidity']
+                humidity_average[1].append(forecast['main']['humidity'])
               elif(forecast['dt'] < first_forecast_time + (60 * 60 * 24 * 4)): #fourth 24 hour of forecast
-                average_temps[2] = (average_temps[2] + forecast['main']['temp']) / 2 if average_temps[2] != 0 else forecast['main']['temp']
+                average_temps[2].append(forecast['main']['temp'])
                 if(forecast['weather'][0]['main'] == 'Rain' or forecast['weather'][0]['main'] == 'Snow'):
                   weather_condition[2] = forecast['weather'][0]['description']
                 elif(weather_condition[2] == ''):
                   weather_condition[2] = forecast['weather'][0]['description']
-                humidity_average[2] = (humidity_average[2] + forecast['main']['humidity']) / 2 if humidity_average[2] != 0 else forecast['main']['humidity']
+                humidity_average[2].append(forecast['main']['humidity'])
               elif(forecast['dt'] < first_forecast_time + (60 * 60 * 24 * 5)): #fifth 24 hour of forecast
-                average_temps[3] = (average_temps[3] + forecast['main']['temp']) / 2 if average_temps[3] != 0 else forecast['main']['temp']
+                average_temps[3].append(forecast['main']['temp'])
                 if(forecast['weather'][0]['main'] == 'Rain' or forecast['weather'][0]['main'] == 'Snow'):
                   weather_condition[3] = forecast['weather'][0]['description']
                 elif(weather_condition[3] == ''):
                   weather_condition[3] = forecast['weather'][0]['description']
-                humidity_average[3] = (humidity_average[3] + forecast['main']['humidity']) / 2 if humidity_average[3] != 0 else forecast['main']['humidity']
-
+                humidity_average[3].append(forecast['main']['humidity'])
             else:
               await client.send_message(message.author, 'Something went wrong. Sorry about that. Please try again later.')
               return weather_cache
