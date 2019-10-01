@@ -62,7 +62,7 @@ id_count           = '540194885865832518'
 # Update for each revision using format yyyy-mm-dd_#
 # where '#' is the release number for that day.
 # e.g. 2019-03-31_1 is the first release of March 31st, 2019
-version = '2019-10_01_2'
+version = '2019-10_01_3'
 
 client = Client()
 
@@ -609,6 +609,8 @@ async def on_message(message):
   global mess_with_kevin
   global limit_giphy_searches
   global giphy_file_contents
+  global lunch_hour
+  global lunch_minute
   if(message.author != client.user and message.channel.name):
     message_string = (message.author.name + " said : \"" + message.content + "\" in #" + message.channel.name + " @ " + time.ctime())
     print(message_string)
@@ -629,6 +631,11 @@ async def on_message(message):
     await client.send_message(message.channel if message.channel.name else message.author, oof_array[random.randint(0,len(oof_array)-1)])
   if(message.author != client.user and message.channel.name):
     await timecard_reminder(message)
+    now = datetime.datetime.now()
+    if(now.hour > lunch_hour + 1):
+      lunch_hour = 11
+      lunch_minute = 30
+      lunch_time = datetime.datetime(now.year, now.month, now.day + 1, lunch_hour, lunch_minute)
   if(message.channel.id == id_count):
     await count_audit(message)
   elif(message.content.lower() == ('!version')):
