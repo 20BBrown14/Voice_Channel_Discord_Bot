@@ -62,7 +62,7 @@ id_count           = '540194885865832518'
 # Update for each revision using format yyyy-mm-dd_#
 # where '#' is the release number for that day.
 # e.g. 2019-03-31_1 is the first release of March 31st, 2019
-version = '2019-10_01_3'
+version = '2019-10_01_4'
 
 client = Client()
 
@@ -627,7 +627,7 @@ async def on_message(message):
     gottem_array = ['gottem', 'gotem', 'gotm', 'gottum', 'gottm', 'gotm', 'gotim', 'gottim', 'oof', 'gotus', 'gottus', '**OOF**', '***OOF***']
     await client.send_message(message.channel if message.channel.name else message.author, gottem_array[random.randint(0,len(gottem_array)-1)])
   if(message.content.lower() == 'oof'):
-    oof_array = ['big OOF','you dun goofed','oh snap','nice job','you are the winner'];
+    oof_array = ['**BIG OOF**','you dun goofed', 'Pay some respect, send an F', 'oh snap','_nice job_','Can we get an F in chat?', 'Press F'];
     await client.send_message(message.channel if message.channel.name else message.author, oof_array[random.randint(0,len(oof_array)-1)])
   if(message.author != client.user and message.channel.name):
     await timecard_reminder(message)
