@@ -624,6 +624,9 @@ async def on_message(message):
   if(message.content.lower() == 'ope'):
     gottem_array = ['gottem', 'gotem', 'gotm', 'gottum', 'gottm', 'gotm', 'gotim', 'gottim', 'oof', 'gotus', 'gottus', '**OOF**', '***OOF***']
     await client.send_message(message.channel if message.channel.name else message.author, gottem_array[random.randint(0,len(gottem_array)-1)])
+  if(message.content.lower() == 'oof'):
+    oof_array = ['big OOF','you dun goofed','oh snap','nice job','you are the winner'];
+    await client.send_message(message.channel if message.channel.name else message.author, oof_array[random.randint(0,len(oof_array)-1)])
   if(message.author != client.user and message.channel.name):
     await timecard_reminder(message)
   if(message.channel.id == id_count):
