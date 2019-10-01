@@ -62,7 +62,7 @@ id_count           = '540194885865832518'
 # Update for each revision using format yyyy-mm-dd_#
 # where '#' is the release number for that day.
 # e.g. 2019-03-31_1 is the first release of March 31st, 2019
-version = '2019-09-30_2'
+version = '2019-10_01_1'
 
 client = Client()
 
@@ -622,7 +622,7 @@ async def on_message(message):
     await client.delete_message(message)
     return 0
   if(message.content.lower() == 'ope'):
-    gottem_array = ['gottem', 'gotem', 'gotm', 'gottum', 'gottm', 'gotm', 'gotim', 'gottim', 'oof', 'gotus', 'gottus', **OOF**, ***OOF***]
+    gottem_array = ['gottem', 'gotem', 'gotm', 'gottum', 'gottm', 'gotm', 'gotim', 'gottim', 'oof', 'gotus', 'gottus', '**OOF**', '***OOF***']
     await client.send_message(message.channel if message.channel.name else message.author, gottem_array[random.randint(0,len(gottem_array)-1)])
   if(message.author != client.user and message.channel.name):
     await timecard_reminder(message)
