@@ -62,7 +62,7 @@ id_count           = '540194885865832518'
 # Update for each revision using format yyyy-mm-dd_#
 # where '#' is the release number for that day.
 # e.g. 2019-03-31_1 is the first release of March 31st, 2019
-version = '2019-10_01_3'
+version = '2019-10_01_4'
 
 client = Client()
 
@@ -623,6 +623,9 @@ async def on_message(message):
     await client.send_message(message.author, '!downvote <@!' + id_kevin + '>')
     await client.delete_message(message)
     return 0
+  if(message.content.lower() == 'foos?'):
+    foos_response_array = ['when?', 'omw'];
+    await client.send_message(message.channel if message.channel.name else message.author, foos_response_array[random.randint(0,len(foos_response_array)-1)])
   if(message.content.lower() == 'ope'):
     gottem_array = ['gottem', 'gotem', 'gotm', 'gottum', 'gottm', 'gotm', 'gotim', 'gottim', 'oof', 'gotus', 'gottus', '**OOF**', '***OOF***']
     await client.send_message(message.channel if message.channel.name else message.author, gottem_array[random.randint(0,len(gottem_array)-1)])
