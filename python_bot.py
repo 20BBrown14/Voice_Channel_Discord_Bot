@@ -629,6 +629,11 @@ async def on_message(message):
     await client.send_message(message.channel if message.channel.name else message.author, oof_array[random.randint(0,len(oof_array)-1)])
   if(message.author != client.user and message.channel.name):
     await timecard_reminder(message)
+    now = datetime.datetime.now().
+    if(now.hour > lunch.hour + 1):
+      lunch_hour = 11
+      lunch_minute = 30
+      lunch_time = datetime.datetime(now.year, now.month, now.day + 1, lunch_hour, lunch_minute)
   if(message.channel.id == id_count):
     await count_audit(message)
   elif(message.content.lower() == ('!version')):
