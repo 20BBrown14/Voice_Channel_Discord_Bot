@@ -381,7 +381,7 @@ async def mark_command(message):
   await client.delete_message(message)
 
 async def pre_add_reaction(message):
-  users = { 'Mark': '<@!' + id_branden + '>', 'Harold': '<@!' + id_harold + '>', 'Grant': '<@!' + id_grant + '>', 'Kevin': '<@!' + id_kevin + '>', 'Branden': '<@!' + id_mark + '>'}
+  users = { 'Branden': '<@!' + id_branden + '>', 'Harold': '<@!' + id_harold + '>', 'Grant': '<@!' + id_grant + '>', 'Kevin': '<@!' + id_kevin + '>', 'Mark': '<@!' + id_mark + '>'}
   if(users['Branden'] in message.content):
     emoji = get(client.get_all_emojis(), name='Branden')
     await client.add_reaction(message, emoji)
