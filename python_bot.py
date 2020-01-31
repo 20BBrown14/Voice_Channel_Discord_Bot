@@ -53,6 +53,7 @@ id_grant   = '314454492756180994'
 id_kevin   = '122149736659681282'
 id_mark    = '547509875308232745'
 id_harold  = '451156129830141975'
+id_dan     = '258024860360507413'
 
 # Channel IDs
 id_general         = '514154258245877764'
@@ -62,7 +63,7 @@ id_count           = '540194885865832518'
 # Update for each revision using format yyyy-mm-dd_#
 # where '#' is the release number for that day.
 # e.g. 2019-03-31_1 is the first release of March 31st, 2019
-version = '2020-01-31_1'
+version = '2020-01-31_2'
 
 
 client = Client()
@@ -360,28 +361,39 @@ async def vote_command(message, vote):
 
 
 async def mark_command(message):
+
   now = datetime.datetime.now()
   then = datetime.datetime(2019,2,18,8,30,0)
-  timeString = str(now-then)
-  timeDelta = (now-then)
-  reply = ''
-  FORMATCASE = "ALL"
-  months, days = divmod(timeDelta.days, 31)
-  hours, remainder = divmod(timeDelta.seconds, 3600)
-  minutes, seconds = divmod(remainder, 60)
-  if(months and days):
-    reply = "There has been %d months, %d days, %d hours, %d minutes, and %d seconds since <@!%s> got rekt at foosball" % (months, days, hours, minutes, seconds, id_mark)
-  elif(months and not days):
-    reply = "There has been %d months, %d hours, %d minutes, and %d seconds since <@!%s> got rekt at foosball" % (months, hours, minutes, seconds, id_mark)
-  elif(not months and days):
-    reply = "There has been %d days, %d hours, %d minutes, and %d seconds since <@!%s> got rekt at foosball" % (days, hours, minutes, seconds, id_mark)
-  elif(not months and not days):
-    reply = "There has been %d hours, %d minutes, and %d seconds since <@!%s> got rekt at foosball" % (hours, minutes, seconds, id_mark)
+  rd = relativedelta(now,then)
+  years = rd.years
+  months = rd.months
+  days = rd.days
+  hours = rd.hours
+  minutes = rd.minutes
+  seconds = rd.seconds
+  if(not years):
+    if(months and days):
+      reply = "There has been %d months, %d days, %d hours, %d minutes, and %d seconds since <@!%s> got rekt at foosball" % (months, days, hours, minutes, seconds, id_mark)
+    elif(months and not days):
+      reply = "There has been %d months, %d hours, %d minutes, and %d seconds since <@!%s> got rekt at foosball" % (months, hours, minutes, seconds, id_mark)
+    elif(not months and days):
+      reply = "There has been %d days, %d hours, %d minutes, and %d seconds since <@!%s> got rekt at foosball" % (days, hours, minutes, seconds, id_mark)
+    elif(not months and not days):
+      reply = "There has been %d hours, %d minutes, and %d seconds since <@!%s> got rekt at foosball" % (hours, minutes, seconds, id_mark)
+  if(years):
+    if(months and days):
+      reply = "There has been %d years, %d months, %d days, %d hours, %d minutes, and %d seconds since <@!%s> got rekt at foosball" % (years, months, days, hours, minutes, seconds, id_mark)
+    elif(months and not days):
+      reply = "There has been %d years, %d months, %d hours, %d minutes, and %d seconds since <@!%s> got rekt at foosball" % (years, months, hours, minutes, seconds, id_mark)
+    elif(not months and days):
+      reply = "There has been %d years, %d days, %d hours, %d minutes, and %d seconds since <@!%s> got rekt at foosball" % (years, days, hours, minutes, seconds, id_mark)
+    elif(not months and not days):
+      reply = "There has been %d years, %d hours, %d minutes, and %d seconds since <@!%s> got rekt at foosball" % (years, hours, minutes, seconds, id_mark)
   await client.send_message(message.channel, reply)
   await client.delete_message(message)
 
 async def pre_add_reaction(message):
-  users = { 'Branden': '<@!' + id_branden + '>', 'Harold': '<@!' + id_harold + '>', 'Grant': '<@!' + id_grant + '>', 'Kevin': '<@!' + id_kevin + '>', 'Mark': '<@!' + id_mark + '>'}
+  users = { 'Branden': '<@!' + id_branden + '>', 'Harold': '<@!' + id_harold + '>', 'Grant': '<@!' + id_grant + '>', 'Kevin': '<@!' + id_kevin + '>', 'Mark': '<@!' + id_mark + '>', 'Dan':'<@!' + id_dan + '>'}
   if(users['Branden'] in message.content):
     emoji = get(client.get_all_emojis(), name='Branden')
     await client.add_reaction(message, emoji)
@@ -396,6 +408,9 @@ async def pre_add_reaction(message):
     await client.add_reaction(message, emoji)
   if(users['Mark'] in message.content):
     emoji = get(client.get_all_emojis(), name='Mark')
+    await client.add_reaction(message, emoji)
+  if(users['Dan'] in message.content):
+    emoji = get(client.get_all_emojis(), name='Dan')
     await client.add_reaction(message, emoji)
   
 async def lunch_command(message):
@@ -625,7 +640,7 @@ async def on_message(message):
     await client.delete_message(message)
     return 0
   if(message.content.lower() == 'foos?'):
-    foos_response_array = ['when?', 'omw'];
+    foos_response_array = ['when?', 'omw', 'Oh, so that\'s why you never have your stuff done.'];
     await client.send_message(message.channel if message.channel.name else message.author, foos_response_array[random.randint(0,len(foos_response_array)-1)])
   if(message.content.lower() == 'ope'):
     gottem_array = ['gottem', 'gotem', 'gotm', 'gottum', 'gottm', 'gotm', 'gotim', 'gottim', 'oof', 'gotus', 'gottus', '**OOF**', '***OOF***']
