@@ -2,6 +2,8 @@ import requests
 import json
 import discord
 
+from client_interactions import delete_message, send_message
+
 def dictionary_api_url(word_to_define, api_key):
   return "https://www.dictionaryapi.com/api/v3/references/collegiate/json/%s?key=%s" % (word_to_define, api_key)
 
@@ -38,6 +40,8 @@ def create_embeded(word_to_define, function_label, offensive, audio_url, short_d
 
 """
 Define function command
+Allows users to define words
+ex: !define word
 
 @param client: The discord client, generally assumed to be the bot user itself
 @param message: The message the discord bot is responding to
@@ -45,11 +49,11 @@ Define function command
 @result: sends a message always
 @result: deletes the triggering message always
 """
-async def command(client, message, response_channel, delete_message, dictionary_api_key):
+async def command(client, message, dictionary_api_key):
   await delete_message(client, message)
   word_to_define = message.content[8:].strip()
   if(' ' in word_to_define):
-    await client.send_message(message.author, "Please only provide one word to define.")
+    await send_message(client, message, "Please only provide one word to define.", True)
     return
   dictionary_packet = requests.get(dictionary_api_url(word_to_define, dictionary_api_key))
   dictionary_response = dictionary_packet.text
@@ -57,10 +61,10 @@ async def command(client, message, response_channel, delete_message, dictionary_
   if(len(dictionary_response) > 0 and 'meta' in dictionary_response[0]):
     dictionary_response = dictionary_response[0]
   elif(len(dictionary_response) > 0 and not 'meta' in dictionary_response[0]):
-    await client.send_message(message.author, "Unable to define the word '%s', did you maybe mean on of the following? %s" % (word_to_define, dictionary_response))
+    await send_message(client, message, "Unable to define the word '%s', did you maybe mean on of the following? %s" % (word_to_define, dictionary_response), True)
     return
   else:
-    await client.send_message(message.author, "Unable to define the word '%s'" % word_to_define)
+    await send_message(client, message, "Unable to define the word '%s'" % word_to_define, True)
     return
   short_def = dictionary_response['shortdef'] if 'shortdef' in dictionary_response else []
   functional_label = dictionary_response['fl'] if 'fl' in dictionary_response else ''
@@ -69,7 +73,7 @@ async def command(client, message, response_channel, delete_message, dictionary_
   audio_info = dictionary_response['hwi'] if 'hwi' in dictionary_response else ''
   audio_url = audio_api_url(audio_info, word_to_define)
   embeded = create_embeded(word_to_define, functional_label, offensive, audio_api_url(audio_info, word_to_define), short_def)
-  await client.send_message(response_channel, embed=embeded)
+  await client.send_message(message.channel if message.channel.name else message.author, embed=embeded)
 
 
 # String that triggers the help command
