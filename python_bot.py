@@ -23,7 +23,7 @@ id_logs            = '549667908884889602'
 # Update for each revision using format yyyy-mm-dd_#
 # where '#' is the release number for that day.
 # e.g. 2019-03-31_1 is the first release of March 31st, 2019
-version = '2020-03-06_1'
+version = '2020-03-06_2'
 
 client = Client()
 
@@ -44,7 +44,7 @@ async def on_message(message):
     return 0
 
   if(message.author != client.user and message.channel.name):
-    message_string = (message.author.name + " said : \"" + message.content + "\" in #" + message.channel.name + " @ " + time.ctime())
+    message_string = (message.author.name + " said : \"`" + message.content + "`\" in #" + message.channel.name + " @ " + time.ctime())
     print(message_string)
     await client.send_message(discord.Object(id=id_logs), message_string)
 

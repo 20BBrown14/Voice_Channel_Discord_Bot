@@ -35,7 +35,7 @@ async def command(client, message, giphy_api_key):
     gif_url = json.dumps(data["data"][random.randint(0, len(data["data"])-1)]["url"], sort_keys = True, indent = 4)
     display_name = message_author.nick if hasattr(message_author, 'nick') else message_author.name
     result_count = len(data["data"])
-    response_string = '%s \'%s\' by %s with %s %s. %s' % (gif_url[1:len(gif_url)-1], message_content[1:], display_name, str(result_count), 'result' if result_count > 1 else 'results', 'Single result %sadded.' % ('not ' if not new_result else '') if len(data["data"]) == 1 else '')
+    response_string = '%s \'%s\' by %s with %s %s. %s' % (gif_url[1:len(gif_url)-1], message_content[1:], display_name, str(result_count), 'results' if result_count > 1 else 'result', 'Single result %sadded.' % ('not ' if not new_result else '') if len(data["data"]) == 1 else '')
     await send_message(client, message, response_string)
 
 def write_to_file(search_string, data, giphy_cache):
