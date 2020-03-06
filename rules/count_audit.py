@@ -1,0 +1,30 @@
+from client_interactions import delete_message
+
+"""
+Count Audit
+Audits the count channel so only the next number can be sent otherwise deletes whatever was sent
+
+@param client: The discord client, generally assumed to be the bot user itself
+@param message: The message the discord bot is responding to
+@result: Deletes a message if it's not the next number or on error
+"""
+
+async def apply(client, message):
+  try:
+    oldCount = -1
+    newCount = -1
+    first = True
+    async for serverMessage in client.logs_from(message.channel, limit=2):
+      if(first):
+        newCount = int(serverMessage.content)
+        first = False
+        continue
+      oldCount = int(serverMessage.content)
+      if(newCount != oldCount + 1):
+        await delete_message(client, message)
+  except:
+    await delete_message(client, message)
+
+def is_triggered(message):
+  return message.channel.name and message.channel.name.lower() == 'count'
+  

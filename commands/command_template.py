@@ -1,5 +1,6 @@
 """
 Command function template
+Description
 
 @param client: The discord client, generally assumed to be the bot user itself
 @param message: The message the discord bot is responding to
@@ -13,4 +14,7 @@ async def command(client, message, other_args):
 
 
 # String that triggers this command
-TRIGGER = '!some_trigger_mesasge'
+TRIGGER = '!some_trigger_message'
+
+def is_triggered(message_content):
+  # determine if this command will be triggered

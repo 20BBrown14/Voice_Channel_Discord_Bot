@@ -8,7 +8,9 @@ from uszipcode import SearchEngine
 import pytz
 import calendar
 
+import globals_file
 from custom_exceptions import zipcode_invalid_exception
+from client_interactions import delete_message, send_message
 
 def weather_help():
   weather_help_message="""
@@ -112,20 +114,20 @@ def update_cache(option, zipcode, item, weather_cache):
 
 """
 Weather command
+Responds with the weather based on the given paramters
+ex: !weather zip=66502
 
 @param client: The discord client, generally assumed to be the bot user itself
 @param message: The message the discord bot is responding to
-@param channel: The channel to send the command response to
-@param delete_message: Function to try to delete message
-@param weather_cache: Cached weather objects
 @param weather_api_key: Weather api key to hit weather api endpoint with
 @result: Sends a message always
 @result: Deletes messages always
 @result: Hits weather api when needed to get weather information
 """
-async def command(client, message, channel, delete_message, weather_cache, weather_api_key):
+async def command(client, message, weather_api_key):
   await delete_message(client, message)
 
+  weather_cache = globals_file.weather_cache
   message_content = message.content[9:]
   arguments = message_content.split(' ')
   if(arguments[0].strip().lower() == 'forecast'): #check if user wants 5 day forecast
@@ -133,9 +135,9 @@ async def command(client, message, channel, delete_message, weather_cache, weath
     equals_index = weather_options.find('=')
     if(equals_index < 0): #check if user provided zipcode
       if(message_content.strip() == 'help'): #check if user is invoking weather help
-        await client.send_message(message.author, "%s" % weather_help())
+        await send_message(client, message, "%s" % weather_help(), True)
         return weather_cache
-      await client.send_message(message.author, "Please ensure you're using one of the following options:\n%s" % weather_help())
+      await send_message(client, message, "Please ensure you're using one of the following options:\n%s" % weather_help(), True)
       return weather_cache
     if(weather_options[:equals_index].strip().lower() == 'zip'): #check if user provided zip
       zipcode = weather_options[equals_index+1:].strip()
@@ -143,15 +145,15 @@ async def command(client, message, channel, delete_message, weather_cache, weath
       try:
         city, state, timezone = find_zip_info(zipcode)
       except zipcode_invalid_exception: #Catch invalid zip code errors
-        await client.send_message(message.author, "Zipcode (%s) invalid. Only US zip codes are supported." % zipcode)
+        await send_message(client, message, "Zipcode (%s) invalid. Only US zip codes are supported." % zipcode, True)
         return weather_cache
       try:
         timezone = pytz.timezone('US/%s' % timezone)
       except pytz.exceptions.UnknownTimeZoneError: #unknown timezone error
-        await client.send_message(message.author, "Zipcode (%s) is in timezone %s and is not supported or invalid. Contact bot developer if you think this is in error." % (zipcode, timezone))
+        await send_message(client, message, "Zipcode (%s) is in timezone %s and is not supported or invalid. Contact bot developer if you think this is in error." % (zipcode, timezone), True)
         return weather_cache
 
-      await client.send_message(message.channel, "%s %s %s" % (city, state, timezone))
+      await send_message(client, message, "%s %s %s" % (city, state, timezone), True)
 
       now = datetime.datetime.now().timestamp()
       weather_data = None
@@ -161,7 +163,7 @@ async def command(client, message, channel, delete_message, weather_cache, weath
         url = "http://api.openweathermap.org/data/2.5/forecast?zip=%s&APPID=%s" % (zipcode, weather_api_key)
         response = requests.get(url).text
         weather_data = json.loads(response)
-        weather_cache = update_cache('forecast', zipcode, weather_data, weather_cache)
+        globals_file.weather_cache = update_cache('forecast', zipcode, weather_data, weather_cache)
       
       first_forecast_time = None
       average_temps = [[], [], [], []]
@@ -177,7 +179,7 @@ async def command(client, message, channel, delete_message, weather_cache, weath
           if(len(weather_data['list']) > 0):
             first_forecast_time = weather_data['list'][0]['dt']
           else:
-            await client.send_message(message.author, "Something went wrong gathering data. Please try again later.")
+            await send_message(client, message, "Something went wrong gathering data. Please try again later.", True)
             return weather_cache
           for forecast in weather_data['list']:
             if('dt' in forecast):
@@ -215,7 +217,7 @@ async def command(client, message, channel, delete_message, weather_cache, weath
                   weather_condition[3] = forecast['weather'][0]['description']
                 humidity_average[3].append(forecast['main']['humidity'])
             else:
-              await client.send_message(message.author, 'Something went wrong. Sorry about that. Please try again later.')
+              await send_message(client, message, 'Something went wrong. Sorry about that. Please try again later.', True)
               return weather_cache
           #create embeded
           embeded = create_forecast_embeded(zipcode,\
@@ -228,13 +230,13 @@ async def command(client, message, channel, delete_message, weather_cache, weath
                                   weather_condition, \
                                   humidity_average, \
                                   )
-          await client.send_message(channel, embed=embeded)
+          await client.send_message(message.channel if message.channel.name else message.author, embed=embeded)
           return weather_cache
         else:
-          await client.send_message(message.author, 'Something went wrong. Sorry about that. Please try again later.')
+          await send_message(client, message, 'Something went wrong. Sorry about that. Please try again later.', True)
           return weather_cache
       else:
-        await client.send_message(message.author, weather_data['message'])
+        await send_message(client, message, weather_data['message'], True)
         return weather_cache
 
   
@@ -242,9 +244,9 @@ async def command(client, message, channel, delete_message, weather_cache, weath
     equals_index = message_content.find('=')
     if(equals_index < 0): #option not provided
       if(message_content.strip() == 'help'): #weather help command invoked
-        await client.send_message(message.author, "%s" % weather_help())
+        await send_message(client, message, "%s" % weather_help(), True)
         return weather_cache
-      await client.send_message(message.author, "Please ensure you're using one of the following options:\n%s" % weather_help())
+      await send_message(client, message, "Please ensure you're using one of the following options:\n%s" % weather_help(), True)
       return weather_cache
       
     if(message_content[:equals_index].strip().lower() == 'zip'):
@@ -277,11 +279,11 @@ async def command(client, message, channel, delete_message, weather_cache, weath
                                         precip_string(rain), \
                                         precip_string(snow) \
                                       )
-        await client.send_message(channel, embed=weather_embeded)
+        await client.send_message(message.channel if message.channel.name else message.author, embed=weather_embeded)
         return weather_cache
       else:
-        await client.send_message(message.author, weather_data['message'])
+        await send_message(client, message, weather_data['message'], True)
   else:
-    await client.send_message(message.author, "%s" % weather_help())
+    await send_message(client, message, "%s" % weather_help(), True)
 
 TRIGGER = '!weather'
