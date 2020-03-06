@@ -21,7 +21,7 @@ async def apply(client, message):
     return
   else:
     fivepm = datetime(now.year, now.month, now.day, 17, 00)
-    response_message = 'everyone do not forget to submit your time sheets! Only %s until 5PM today.' % str(fivepm - now).split('.')[0]
+    response_message = '@everyone do not forget to submit your time sheets! Only %s until 5PM today.' % str(fivepm - now).split('.')[0]
     if(globals_file.time_card_reminder < current_hour and current_hour < 17):
       await send_message(client, message, response_message)
       globals_file.time_card_reminder = current_hour
