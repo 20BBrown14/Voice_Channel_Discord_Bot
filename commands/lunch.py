@@ -21,6 +21,8 @@ async def command(client, message):
   thirty_minutes_before = globals_file.lunch_time - timedelta(minutes=30)
   ten_minutes_before = globals_file.lunch_time - timedelta(minutes=10)
   lunch_time_grace = timedelta(seconds=45)
+  if(globals_file.lunch_time.day != now.day):
+    globals_file.lunch_time = datetime(now.year, now.month, now.day, 11, 30)
   if((now == globals_file.lunch_time) or (now > globals_file.lunch_time and now < globals_file.lunch_time + lunch_time_grace)):
     response_message = 'You bet! It\'s lunch time!'
     await send_message(client, message, response_message)
