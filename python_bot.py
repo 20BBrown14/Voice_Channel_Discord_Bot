@@ -34,7 +34,7 @@ async def on_ready():
     print(client.user.name)
     print(client.user.id)
     print('------')
-    client_game = discord.Game(name='Goosball v%s' % version)
+    client_game = discord.Game(name='Animal Crossing: New Horizons')
     await client.change_status(game = client_game)
     globals_file.init()
 
