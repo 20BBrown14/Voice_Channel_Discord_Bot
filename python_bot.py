@@ -23,7 +23,7 @@ id_logs            = '549667908884889602'
 # Update for each revision using format yyyy-mm-dd_#
 # where '#' is the release number for that day.
 # e.g. 2019-03-31_1 is the first release of March 31st, 2019
-version = '2020-03-06_2'
+version = '2020-03-20_1'
 
 client = Client()
 
@@ -99,7 +99,7 @@ async def on_message(message):
     await lunch.command(client, message)
 
   elif(Mark.is_triggered(message.content)):
-    await Mark.command(client, message, id_mark)
+    await Mark.command(client, message, globals_file.id_mark)
 
   elif(friday.is_triggered(message.content)):
     await friday.command(client, message)
