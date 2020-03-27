@@ -20,7 +20,7 @@ ex: /some search term
 """
 async def command(client, message, giphy_api_key):
   giphy_cache = globals_file.giphy_file_cache
-  await delete_message(client, message)
+  await delete_message(message)
   message_content = message.content
   message_author = message.author
   
@@ -36,7 +36,7 @@ async def command(client, message, giphy_api_key):
     display_name = message_author.nick if hasattr(message_author, 'nick') else message_author.name
     result_count = len(data["data"])
     response_string = '%s \'%s\' by %s with %s %s. %s' % (gif_url[1:len(gif_url)-1], message_content[1:], display_name, str(result_count), 'results' if result_count > 1 else 'result', 'Single result %sadded.' % ('not ' if not new_result else '') if len(data["data"]) == 1 else '')
-    await send_message(client, message, response_string)
+    await send_message(message, response_string)
 
 def write_to_file(search_string, data, giphy_cache):
   new_result = True

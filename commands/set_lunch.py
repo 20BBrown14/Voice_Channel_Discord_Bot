@@ -15,7 +15,7 @@ Sets the lunch time for the current day
 @result: adds a react on....
 """
 async def command(client, message):
-  await delete_message(client, message)
+  await delete_message(message)
   message_content = message.content
   if(not len(message_content.split(' ')) == 2):
     return await error_response(client, message)
@@ -37,11 +37,11 @@ async def command(client, message):
   now = datetime.now()
   globals_file.lunch_time = datetime(now.year, now.month, now.day, new_hour, new_minute)
   response_message = "Lunch time has been set to %s" % globals_file.lunch_time.strftime("%Y-%m-%d %H:%M")
-  await send_message(client, message, response_message)
+  await send_message(message, response_message)
 
 async def error_response(client, message):
   response_message = 'Format should be `!setlunch HH:MM` where HH is 00-23 and MM is 00-59'
-  await send_message(client, message, response_message, True)
+  await send_message(message, response_message, True)
   return
 # String that triggers this command
 TRIGGER = '!setlunch '

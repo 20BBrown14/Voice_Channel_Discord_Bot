@@ -2,12 +2,14 @@
 import json
 from datetime import datetime
 
-id_branden = '159785058381725696'
-id_grant   = '314454492756180994'
-id_kevin   = '122149736659681282'
-id_mark    = '547509875308232745'
-id_harold  = '451156129830141975'
-id_dan     = '258024860360507413'
+id_branden = 159785058381725696
+id_grant   = 314454492756180994
+id_kevin   = 122149736659681282
+id_mark    = 547509875308232745
+id_harold  = 451156129830141975
+id_dan     = 258024860360507413
+
+id_logs    = 549667908884889602
 
 global player
 global voice_client
@@ -16,8 +18,9 @@ global user_ids
 global lunch_time
 global time_card_reminder
 global weather_cache
+global log_channel
 
-def init():
+def init(client):
     global player
     player = None
 
@@ -46,3 +49,9 @@ def init():
 
     global weather_cache
     weather_cache = json.loads('{}')
+
+    global log_channel
+    for guild in client.guilds:
+      for channel in guild.channels:
+        if channel.id == id_logs:
+          log_channel = channel

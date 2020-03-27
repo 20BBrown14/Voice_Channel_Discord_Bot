@@ -50,10 +50,10 @@ ex: !define word
 @result: deletes the triggering message always
 """
 async def command(client, message, dictionary_api_key):
-  await delete_message(client, message)
+  await delete_message(message)
   word_to_define = message.content[8:].strip()
   if(' ' in word_to_define):
-    await send_message(client, message, "Please only provide one word to define.", True)
+    await send_message(message, "Please only provide one word to define.", True)
     return
   dictionary_packet = requests.get(dictionary_api_url(word_to_define, dictionary_api_key))
   dictionary_response = dictionary_packet.text
@@ -61,10 +61,10 @@ async def command(client, message, dictionary_api_key):
   if(len(dictionary_response) > 0 and 'meta' in dictionary_response[0]):
     dictionary_response = dictionary_response[0]
   elif(len(dictionary_response) > 0 and not 'meta' in dictionary_response[0]):
-    await send_message(client, message, "Unable to define the word '%s', did you maybe mean on of the following? %s" % (word_to_define, dictionary_response), True)
+    await send_message(message, "Unable to define the word '%s', did you maybe mean on of the following? %s" % (word_to_define, dictionary_response), True)
     return
   else:
-    await send_message(client, message, "Unable to define the word '%s'" % word_to_define, True)
+    await send_message(message, "Unable to define the word '%s'" % word_to_define, True)
     return
   short_def = dictionary_response['shortdef'] if 'shortdef' in dictionary_response else []
   functional_label = dictionary_response['fl'] if 'fl' in dictionary_response else ''
@@ -73,7 +73,7 @@ async def command(client, message, dictionary_api_key):
   audio_info = dictionary_response['hwi'] if 'hwi' in dictionary_response else ''
   audio_url = audio_api_url(audio_info, word_to_define)
   embeded = create_embeded(word_to_define, functional_label, offensive, audio_api_url(audio_info, word_to_define), short_def)
-  await client.send_message(message.channel if message.channel.name else message.author, embed=embeded)
+  await message.channel.send( embed=embeded)
 
 
 # String that triggers the help command

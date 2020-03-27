@@ -10,9 +10,9 @@ Converts a message to an emojify letter'd message
 @result: Deletes a triggering message always
 """
 async def command(client, message):
-  await delete_message(client, message)
+  await delete_message(message)
   content = emojify(message.content[9:].lower())
-  await send_message(client, message, content)
+  await send_message(message, content)
 
 num2words = {1: ':one:', 2: ':two:', 3: ':three:', 4: ':four:', 5: ':five:', \
              6: ':six:', 7: ':seven:', 8: ':eight:', 9: ':nine:', 0: ':zero:'}

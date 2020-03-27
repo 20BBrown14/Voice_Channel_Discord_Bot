@@ -12,9 +12,9 @@ ex: /u/gallowboob
 """
 
 async def apply(client, message):
-  await delete_message(client, message)
+  await delete_message(message)
   reddit_link = 'https://www.reddit.com%s/' % message.content
-  await send_message(client, message, reddit_link)
+  await send_message(message, reddit_link)
 
 def is_triggered(message_content):
   # determine if this command will be triggered
