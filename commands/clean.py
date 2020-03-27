@@ -11,7 +11,7 @@ ex: !clean 50
 @result: Purges messages
 """
 async def command(client, message):
-  await delete_message(client, message)
+  await delete_message(message)
   amount = message.content[7:]
   try:
     amount = int(amount)

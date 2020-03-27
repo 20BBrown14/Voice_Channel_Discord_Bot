@@ -51,7 +51,7 @@ async def command(client, message, vote):
           row['upvotes'] = str(int(row['upvotes']) + 1)
           row['net'] = str(int(row['net']) + 1)
         else:
-          await send_message(client, message, "Stop trying to " + vote + "vote yourself you goddamn hooligan!", True)
+          await send_message(message, "Stop trying to " + vote + "vote yourself you goddamn hooligan!", True)
           print("Someone tried to upvote themselves")
       rows.append(row)
     if not foundName:
@@ -85,8 +85,8 @@ async def command(client, message, vote):
       await add_reaction(client, message, emoji)
   #await client.send_message(message.channel, displayString)
   if(vote == 'display'):
-    await send_message(client, message, displayString)
-    await delete_message(client, message)
+    await send_message(message, displayString)
+    await delete_message(message)
 
 def is_user_mentioned(id, mentions):
   for member in mentions:

@@ -21,9 +21,9 @@ async def apply(client, message):
         continue
       oldCount = int(serverMessage.content)
       if(newCount != oldCount + 1):
-        await delete_message(client, message)
+        await delete_message(message)
   except:
-    await delete_message(client, message)
+    await delete_message(message)
 
 def is_triggered(message):
   return message.channel.name and message.channel.name.lower() == 'count'

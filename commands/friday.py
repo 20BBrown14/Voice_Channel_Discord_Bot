@@ -13,16 +13,16 @@ Lets the user know if it's Friday or not
 @result: Deletes triggering message always
 """
 async def command(client, message):
-  await delete_message(client, message)
+  await delete_message(message)
   weekday = datetime.today().weekday()
   calendarList = list(calendar.day_name)
 
   if(calendarList[weekday] != 'Friday'):
     response_message = "Lol sucks to be you sucka, It\'s only %s." % calendarList[weekday]
-    await send_message(client, message, response_message)
+    await send_message(message, response_message)
   else:
-    await send_message('Friday!')
-    await send_message("/friday")
+    await send_message(message, 'Friday!')
+    await send_message(message, "/friday")
 
 
 # String that triggers this command

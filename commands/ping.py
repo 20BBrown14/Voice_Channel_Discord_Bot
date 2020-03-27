@@ -12,10 +12,10 @@ ex: !ping
 @result: Send a message always
 """
 async def command(client, message):
-  d = datetime.utcnow() - message.timestamp
+  d = datetime.utcnow() - message.created_at
   s = d.seconds*1000 + d.microseconds//1000
   response = 'Ping: %sms' % str(s)
-  await send_message(client, message, response)
+  await send_message(message, response)
 
 
 # String that triggers this command

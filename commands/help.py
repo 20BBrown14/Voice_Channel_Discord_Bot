@@ -33,8 +33,8 @@ async def command(client, message):
   I am a little open source whore. See my birthday suit here: <https://github.com/20BBrown14/Voice_Channel_Discord_Bot>
   Nibikk#8335 is the creator of me, contact him if you have any questions.
   Last updated 03/06/2020"""
-  await client.send_message(channel, help_message)
-  await client.delete_message(message)
+  await send_message(message, help_message)
+  await delete_message(message)
 
 # String that triggers the help command
 TRIGGER = '!help'

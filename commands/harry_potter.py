@@ -23,7 +23,7 @@ async def command(client, message, player_change):
   if(player_change == 'pause'):
     if(globals_file.player != None and globals_file.player.is_playing()):
       globals_file.player.pause()
-      await send_message(client, message, "Player has been paused")
+      await send_message(message, "Player has been paused")
     return
   elif(player_change == 'stop'):
     if(globals_file.player != None and globals_file.player.is_playing() or not globals_file.player.is_done()):
@@ -31,16 +31,16 @@ async def command(client, message, player_change):
       globals_file.player = None
       await globals_file.voice_client.disconnect()
       globals_file.voice_client = None
-      await send_message(client, message, "Player has been stopped")
+      await send_message(message, "Player has been stopped")
     return
   elif(player_change == 'resume'):
     if(globals_file.player != None and not globals_file.player.is_playing()):
       globals_file.player.resume()
-      await send_message(client, message, "Player has been resumed")
+      await send_message(message, "Player has been resumed")
     return
   elif(player_change == 'begin'):
     if(globals_file.player != None):
-      await send_message(client, message, 'Player already initialized. Try `!harrypotter resume`')
+      await send_message(message, 'Player already initialized. Try `!harrypotter resume`')
       return
     args = message.content[len('!harrypotter begin '):]
     args = args.split(' ')
@@ -69,16 +69,16 @@ async def command(client, message, player_change):
         chapter = int(chapter)
         part = int(part)
       except:
-        await send_message(client, message, 'Use format `HP#-Chapter##-Part##` to define a chapter to start at. For one digit numbers for chapter and part use a leading 0.')
+        await send_message(message, 'Use format `HP#-Chapter##-Part##` to define a chapter to start at. For one digit numbers for chapter and part use a leading 0.')
         return
       if(book_number > 7 or book_number < 1):
-        await send_message(client, message, 'Book number must be 1-7, inclusive')
+        await send_message(message, 'Book number must be 1-7, inclusive')
         return
       if(chapter < 1):
-        await send_message(client, message, 'Chapter must be greater than 01')
+        await send_message(message, 'Chapter must be greater than 01')
         return
       if(part < 1):
-        await send_message(client, message, 'Part must be greater than 01')
+        await send_message(message, 'Part must be greater than 01')
         return
       book_name = ''
       file_name = "Chapter %d.%d HP%d" % (chapter, part, book_number)
@@ -146,19 +146,19 @@ async def command(client, message, player_change):
                 continue
             else:
               audio_files.append(os.path.join(root, some_file))
-      await send_message(client, message, "Playing book: %s" % book)
+      await send_message(message, "Playing book: %s" % book)
       audio_files = natsorted(audio_files, key=lambda y: y.lower())
       audio_files = natsorted(audio_files, alg=ns.IGNORECASE)
       for book_part in audio_files:
         globals_file.player = globals_file.voice_client.create_ffmpeg_player(book_part)
         globals_file.player.volume = 100/100
-        await send_message(client, message, "Playing audio file: %s" % book_part)
+        await send_message(message, "Playing audio file: %s" % book_part)
         globals_file.player.start()
         while(not globals_file.player.is_done()):
           await asyncio.sleep(1)
         globals_file.player.stop()
-        await send_message(client, message, "Finished playing audio file: %s" % book_part)
-      await send_message(client, message, "Finished playing book: %s" % book)
+        await send_message(message, "Finished playing audio file: %s" % book_part)
+      await send_message(message, "Finished playing book: %s" % book)
 
 TRIGGER_BEGIN = '!harrypotter begin'
 TRIGGER_PAUSE = '!harrypotter pause'

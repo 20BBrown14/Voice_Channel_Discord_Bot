@@ -9,6 +9,7 @@ import config
 import globals_file
 from commands import help, weather, single_giphy_results_display, harry_potter, define, giphy, ping, clean, Mark, lunch, set_lunch, emojify, friday, vote
 from rules import reddit_link, pre_add_reaction, auto_triggered_messages, timecard_reminder, count_audit
+from client_interactions import send_message
 
 #from config.py file
 discordApiKey = config.bot_token 
@@ -18,14 +19,14 @@ dictionary_api = config.dictionary_api
 spanish_english_dictionary_api = config.spanish_english_api
 
 # Channel IDs
-id_logs            = '549667908884889602'
+id_logs            = 549667908884889602
 
 # Update for each revision using format yyyy-mm-dd_#
 # where '#' is the release number for that day.
 # e.g. 2019-03-31_1 is the first release of March 31st, 2019
 version = '2020-03-20_1'
 
-client = Client()
+client = discord.Client()
 
 @client.event
 async def on_ready():
@@ -35,8 +36,8 @@ async def on_ready():
     print(client.user.id)
     print('------')
     client_game = discord.Game(name='Animal Crossing: New Horizons')
-    await client.change_status(game = client_game)
-    globals_file.init()
+    await client.change_presence(activity = client_game)
+    globals_file.init(client)
 
 @client.event
 async def on_message(message):
@@ -46,7 +47,7 @@ async def on_message(message):
   if(message.author != client.user and message.channel.name):
     message_string = (message.author.name + " said : \"`" + message.content + "`\" in #" + message.channel.name + " @ " + time.ctime())
     print(message_string)
-    await client.send_message(discord.Object(id=id_logs), message_string)
+    await globals_file.log_channel.send(message_string)
 
   elif(message.author != client.user and not message.channel.name):
     print(message.author.name + " said: \"" + message.content + "\" privately")
@@ -63,10 +64,10 @@ async def on_message(message):
     await auto_triggered_messages.apply(client, message)
 
   elif(message.content.lower() == ('!version')):
-    await client.send_message(message.channel if message.channel.name else message.author, 'Version: ' + version)
+    await send_message(message, 'Version: %s' % version)
 
   elif(message.content.startswith('!status')):
-    await client.send_message(message.channel, 'I am here')
+    await send_message(message, 'I am here')
 
   elif(message.content.startswith(help.TRIGGER)):
     await help.command(client, message)
@@ -84,16 +85,19 @@ async def on_message(message):
     await clean.command(client, message)
 
   elif(message.content.lower() == '!pizza'):
-    send_message(client, message, 'Pizza? Who\'s paying for this? Definitely not me.')
+    send_message(message, 'Pizza? Who\'s paying for this? Definitely not me.')
 
   elif(vote.is_downvote(message.content)):
-    await vote.command(client, message, 'down')
+    await send_message(message, 'This command is currently unavailable')
+    # await vote.command(client, message, 'down')
 
   elif(vote.is_upvote(message.content)):
-    await vote.command(client, message, 'up')
+    await send_message(message, 'This command is currently unavailable')
+    # await vote.command(client, message, 'up')
 
   elif(vote.is_display(message.content)):
-    await vote.command(client, message, 'display')
+    await send_message(message, 'This command is currently unavailable')
+    #await vote.command(client, message, 'display')
 
   elif(lunch.is_triggered(message.content)):
     await lunch.command(client, message)
@@ -117,16 +121,20 @@ async def on_message(message):
     await weather.command(client, message, weather_api_key)
 
   elif(message.content.lower().startswith(harry_potter.TRIGGER_PAUSE)):
-    await harry_potter.command(client, message, 'pause')
+    await send_message(message, 'This command is currently unavailable')
+    # await harry_potter.command(client, message, 'pause')
 
   elif(message.content.lower().startswith(harry_potter.TRIGGER_STOP)):
-    await harry_potter.command(client, message, 'stop')
+    await send_message(message, 'This command is currently unavailable')
+    # await harry_potter.command(client, message, 'stop')
 
   elif(message.content.lower().startswith(harry_potter.TRIGGER_RESUME)):
-    await harry_potter.command(client, message, 'resume')
+    await send_message(message, 'This command is currently unavailable')
+    # await harry_potter.command(client, message, 'resume')
 
   elif(message.content.lower().startswith(harry_potter.TRIGGER_BEGIN)):
-    await harry_potter.command(client, message, 'begin')
+    await send_message(message, 'This command is currently unavailable')
+    # await harry_potter.command(client, message, 'begin')
 
   elif(message.content.lower().startswith(define.TRIGGER)):
     await define.command(client, message, dictionary_api)
