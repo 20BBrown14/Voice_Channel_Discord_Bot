@@ -14,7 +14,7 @@ async def apply(client, message):
     oldCount = -1
     newCount = -1
     first = True
-    async for serverMessage in client.logs_from(message.channel, limit=2):
+    async for serverMessage in message.channel(limit=2):
       if(first):
         newCount = int(serverMessage.content)
         first = False
