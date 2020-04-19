@@ -4,6 +4,11 @@ This bot announces who leaves and enters a voice channel it is a part of along w
 Be sure to read in-line comments to make everything work. README update to come soon.
 
 ## Setup
+Python 3.5 or greater required
+
+Install modules as defined in requirements.txt
+`pip install requirements.txt`
+
 You'll need to create a bot for the discord API. You'll get a secret token. Be sure to add that in [python_bot.py L232](https://github.com/20BBrown14/Voice_Channel_Discord_Bot/blob/master/python_bot.py#L232) in place of `TOKEN`
 
 Follow the discord provided instructions on how to setup a bot on your discord server.
