@@ -85,7 +85,7 @@ async def on_message(message):
     await clean.command(client, message)
 
   elif(message.content.lower() == '!pizza'):
-    send_message(message, 'Pizza? Who\'s paying for this? Definitely not me.')
+    await send_message(message, 'Pizza? Who\'s paying for this? Definitely not me.')
 
   elif(vote.is_downvote(message.content)):
     await send_message(message, 'This command is currently unavailable')
