@@ -35,8 +35,8 @@ async def command(client, message):
     return await error_response(client, message)
   
   now = datetime.now()
-  globals_file.lunch_time = datetime(now.year, now.month, now.day, new_hour, new_minute)
-  response_message = "Lunch time has been set to %s" % globals_file.lunch_time.strftime("%Y-%m-%d %H:%M")
+  globals_file.lunch_time['today'] = datetime(now.year, now.month, now.day, new_hour, new_minute)
+  response_message = "Lunch time has been set to %s" % globals_file.lunch_time['today'].strftime("%Y-%m-%d %H:%M")
   await send_message(message, response_message)
 
 async def error_response(client, message):

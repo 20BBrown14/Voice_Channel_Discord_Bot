@@ -24,7 +24,7 @@ async def add_reaction(client, message, emoji):
   try:
     await message.add_reaction(emoji)
   except:
-    print('Message DNE')
+    return
 
 def get_emoji(client, message, emoji_name):
   return get(client.emojis, name=emoji_name)

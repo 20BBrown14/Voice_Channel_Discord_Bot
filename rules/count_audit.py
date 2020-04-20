@@ -1,3 +1,4 @@
+import globals_file
 from client_interactions import delete_message
 
 """
@@ -26,5 +27,5 @@ async def apply(client, message):
     await delete_message(message)
 
 def is_triggered(message):
-  return message.channel.name and message.channel.name.lower() == 'count'
+  return message.channel == globals_file.count_config['count_channel']
   

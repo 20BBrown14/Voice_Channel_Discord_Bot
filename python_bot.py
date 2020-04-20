@@ -18,14 +18,6 @@ weather_api_key = config.weather_api_key
 dictionary_api = config.dictionary_api
 spanish_english_dictionary_api = config.spanish_english_api
 
-# Channel IDs
-id_logs            = 549667908884889602
-
-# Update for each revision using format yyyy-mm-dd_#
-# where '#' is the release number for that day.
-# e.g. 2019-03-31_1 is the first release of March 31st, 2019
-version = '2020-03-20_1'
-
 client = discord.Client()
 
 @client.event
@@ -35,36 +27,33 @@ async def on_ready():
     print(client.user.name)
     print(client.user.id)
     print('------')
-    client_game = discord.Game(name='Animal Crossing: New Horizons')
-    await client.change_presence(activity = client_game)
-    globals_file.init(client)
+    globals_file.init(client, config)
+    if(globals_file.game_played_config):
+      client_game = discord.Game(name=globals_file.game_played_config['game_played'])
+      await client.change_presence(activity = client_game)
 
 @client.event
 async def on_message(message):
-  if(message.channel.name == 'logs'):
+  if(message.channel.id == globals_file.logs_config['logs_channel']):
     return 0
 
-  if(message.author != client.user and message.channel.name):
-    message_string = (message.author.name + " said : \"`" + message.content + "`\" in #" + message.channel.name + " @ " + time.ctime())
-    print(message_string)
-    await globals_file.log_channel.send(message_string)
-
-  elif(message.author != client.user and not message.channel.name):
-    print(message.author.name + " said: \"" + message.content + "\" privately")
+  if(message.author != client.user and message.channel.name and message.channel.id not in globals_file.logs_config['ignored_channels']):
+    message_string = (message.author.name + " said : \"" + message.clean_content + "\" in #" + message.channel.name + " @ " + time.ctime())
+    await globals_file.logs_config['logs_channel'].send(message_string)
 
   await pre_add_reaction.apply(client, message)
 
-  if(message.author != client.user and message.channel.name):
+  if(message.author != client.user and message.channel.name and globals_file.timecard_reminder_config):
     await timecard_reminder.apply(client, message)
 
-  if(count_audit.is_triggered(message)):
+  if(globals_file.count_config and count_audit.is_triggered(message)):
     await count_audit.apply(client, message)
 
   elif(auto_triggered_messages.is_triggered(message.content)):
     await auto_triggered_messages.apply(client, message)
 
   elif(message.content.lower() == ('!version')):
-    await send_message(message, 'Version: %s' % version)
+    await send_message(message, 'Version: %s' % globals_file.version)
 
   elif(message.content.startswith('!status')):
     await send_message(message, 'I am here')
@@ -78,7 +67,7 @@ async def on_message(message):
   elif(reddit_link.is_triggered(message.content)):
     await reddit_link.apply(client, message)
 
-  elif(giphy.is_triggered(message.content)):
+  elif(config.giphy_api_key and giphy.is_triggered(message.content)):
     await giphy.command(client, message, giphyApiKey)
 
   elif(clean.is_triggered(message.content)):
@@ -99,7 +88,7 @@ async def on_message(message):
     await send_message(message, 'This command is currently unavailable')
     #await vote.command(client, message, 'display')
 
-  elif(lunch.is_triggered(message.content)):
+  elif(globals_file.lunch_time and lunch.is_triggered(message.content)):
     await lunch.command(client, message)
 
   elif(Mark.is_triggered(message.content)):
@@ -111,13 +100,13 @@ async def on_message(message):
   elif(emojify.is_triggered(message.content)):
     await emojify.command(client, message)
 
-  elif(set_lunch.is_triggered(message.content)):
+  elif(globals_file.lunch_time and set_lunch.is_triggered(message.content)):
     await set_lunch.command(client, message)
 
   elif(message.content.startswith(single_giphy_results_display.TRIGGER)):
     await single_giphy_results_display.command(client, message)
 
-  elif(message.content.lower().startswith(weather.TRIGGER)):
+  elif(config.weather_api_key and message.content.lower().startswith(weather.TRIGGER)):
     await weather.command(client, message, weather_api_key)
 
   elif(message.content.lower().startswith(harry_potter.TRIGGER_PAUSE)):
@@ -136,7 +125,7 @@ async def on_message(message):
     await send_message(message, 'This command is currently unavailable')
     # await harry_potter.command(client, message, 'begin')
 
-  elif(message.content.lower().startswith(define.TRIGGER)):
+  elif(config.dictionary_api and message.content.lower().startswith(define.TRIGGER)):
     await define.command(client, message, dictionary_api)
 
 client.run(discordApiKey)

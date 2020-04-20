@@ -6,6 +6,7 @@ from client_interactions import send_message
 """
 Timecard Reminder
 Reminds people in the chat to submit their time cards on Fridays
+Config should be set in config.py
 
 @param client: The discord client, generally assumed to be the bot user itself
 @param message: The message the discord bot is responding to
@@ -15,19 +16,20 @@ Reminds people in the chat to submit their time cards on Fridays
 async def apply(client, message):
   now = datetime.now()
   current_hour = now.hour
-  today_day = now.weekday()
-  if(today_day != 4):
-    globals_file.time_card_reminder = 12
+  today_day = now.strftime("%A").lower()
+  remind_time = globals_file.timecard_reminder_config['time_due'].split(':')
+  remind_time = datetime(now.year, now.month, now.day, int(remind_time[0]), int(remind_time[1]))
+  if(today_day != globals_file.timecard_reminder_config['remind_day'].lower()):
+    globals_file.timecard_reminder_config['next_hour_reminder'] = remind_time.hour - 5
     return
   else:
-    fivepm = datetime(now.year, now.month, now.day, 17, 00)
-    response_message = '@everyone do not forget to submit your time sheets! Only %s until 5PM today.' % str(fivepm - now).split('.')[0]
-    if(globals_file.time_card_reminder < current_hour and current_hour < 17):
+    response_message = '@everyone do not forget to submit your time sheets! Only %s until %s today.' % (str(remind_time - now).split('.')[0], globals_file.timecard_reminder_config['time_due'])
+    if(globals_file.timecard_reminder_config['next_hour_reminder'] < current_hour and current_hour < remind_time.hour):
       await send_message(message, response_message)
-      globals_file.time_card_reminder = current_hour
-    elif(globals_file.time_card_reminder == 16 and globals_file.time_card_reminder < 17 and now.hour == 16 and now.minute > 30):
+      globals_file.timecard_reminder_config['next_hour_reminder'] = current_hour
+    elif(globals_file.timecard_reminder_config['next_hour_reminder'] == remind_time.hour - 1 and globals_file.timecard_reminder_config['next_hour_reminder'] < remind_time.hour and now.hour == remind_time.hour - 1 and now.minute > 30):
       await send_message(message, response_message)
-      globals_file.time_card_reminder = 17
+      globals_file.timecard_reminder_config['next_hour_reminder'] = remind_time.hour
       
 
 

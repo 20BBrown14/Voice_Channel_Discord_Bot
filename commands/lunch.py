@@ -19,29 +19,29 @@ async def command(client, message):
   gif_searches = ['/excited', '/hell yes', '/I\'m ready', '/Let\'s do this', '/Leggo', '/Lunch time']
   now = datetime.now()
 
-  if(globals_file.lunch_time.day != now.day):
-    globals_file.lunch_time = datetime(now.year, now.month, now.day, 11, 30)
+  if(globals_file.lunch_time['today'].day != now.day):
+    globals_file.lunch_time = datetime(now.year, now.month, now.day, int(globals_file.lunch_time['default'].split(':')[0]), int(globals_file.lunch_time['default'].split(':')[1]))
 
-  thirty_minutes_before = globals_file.lunch_time - timedelta(minutes=30)
-  ten_minutes_before = globals_file.lunch_time - timedelta(minutes=10)
+  thirty_minutes_before = globals_file.lunch_time['today'] - timedelta(minutes=30)
+  ten_minutes_before = globals_file.lunch_time['today'] - timedelta(minutes=10)
   lunch_time_grace = timedelta(seconds=45)
   
   
-  if((now == globals_file.lunch_time) or (now > globals_file.lunch_time and now < globals_file.lunch_time + lunch_time_grace)):
+  if((now == globals_file.lunch_time['today']) or (now > globals_file.lunch_time['today'] and now < globals_file.lunch_time['today'] + lunch_time_grace)):
     response_message = 'You bet! It\'s lunch time!'
     await send_message(message, response_message)
   elif(now < thirty_minutes_before):
-    response_message = 'Not lunch time yet. Lunch is at %s' % globals_file.lunch_time.strftime("%H:%M")
+    response_message = 'Not lunch time yet. Lunch is at %s' % globals_file.lunch_time['today'].strftime("%H:%M")
     await send_message(message, response_message)
   elif(now > thirty_minutes_before and now < ten_minutes_before):
-    response_message = 'Almost there! Only %s to go!' % ':'.join(str(globals_file.lunch_time - now).split('.')[0].split(':')[1:])
+    response_message = 'Almost there! Only %s to go!' % ':'.join(str(globals_file.lunch_time['today'] - now).split('.')[0].split(':')[1:])
     await send_message(message, response_message)
-  elif((now > ten_minutes_before and now < globals_file.lunch_time)):
+  elif((now > ten_minutes_before and now < globals_file.lunch_time['today'])):
     response_message = 'Woot woot! Basically there! I\'m so excited, how about you?'
     response_gif = gif_searches[random.randint(0, len(gif_searches)-1)]
     await send_message(message, response_message)
     await send_message(message, response_gif)
-  elif(now > globals_file.lunch_time + lunch_time_grace):
+  elif(now > globals_file.lunch_time['today'] + lunch_time_grace):
     response_message = 'Whoa there buckaroo. You\'ve already had lunch today. Step off.'
     await send_message(message, response_message)
 
