@@ -33,7 +33,7 @@ async def on_ready():
 
 @client.event
 async def on_message(message):
-  if(globals_file.logs_config and message.channel.id == globals_file.logs_config['logs_channel']):
+  if(globals_file.logs_config and message.channel == globals_file.logs_config['logs_channel']):
     return 0
 
   if(message.author != client.user and message.channel.name and message.channel.id not in globals_file.logs_config['ignored_channels']):
