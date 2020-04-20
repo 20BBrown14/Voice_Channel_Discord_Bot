@@ -16,7 +16,6 @@ discordApiKey = config.bot_token
 giphyApiKey = config.giphy_api_key
 weather_api_key = config.weather_api_key
 dictionary_api = config.dictionary_api
-spanish_english_dictionary_api = config.spanish_english_api
 
 client = discord.Client()
 
