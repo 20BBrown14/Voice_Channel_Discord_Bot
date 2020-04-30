@@ -20,7 +20,7 @@ def init(client, config):
   # where '#' is the release number for that day.
   # e.g. 2019-03-31_1 is the first release of March 31st, 2019
     global version 
-    version = '2020-04-20_1'
+    version = '2020-04-30_1'
 
     global player
     player = None
