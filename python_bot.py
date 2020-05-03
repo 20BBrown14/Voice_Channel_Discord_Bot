@@ -36,7 +36,7 @@ async def on_message(message):
   if(globals_file.logs_config and message.channel == globals_file.logs_config['logs_channel']):
     return 0
 
-  if(message.author != client.user and message.channel.name and message.channel.id not in globals_file.logs_config['ignored_channels']):
+  if(message.author != client.user and message.channel.name and globals_file.logs_config and message.channel.id not in globals_file.logs_config['ignored_channels']):
     message_string = (message.author.name + " said : \"" + message.clean_content + "\" in #" + message.channel.name + " @ " + time.ctime())
     await globals_file.logs_config['logs_channel'].send(message_string)
 
