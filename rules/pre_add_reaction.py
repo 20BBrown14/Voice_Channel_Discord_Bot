@@ -17,7 +17,7 @@ async def apply(client, message):
   for i in mentions:
     for options in globals_file.mention_reactions_config:
       if(i.id == options['user_id']):
-        emoji = get_emoji(client, message, options['emoji_name'].lower())
+        emoji = get_emoji(client, message, options['emoji_name'])
         await add_reaction(client, message, emoji)
 
   
