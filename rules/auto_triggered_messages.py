@@ -24,12 +24,26 @@ async def apply(client, message):
     await send_message(message, oof_array[random.randint(0,len(oof_array)-1)])
   elif(content == 'lol'):
     await send_message(message, 'lo\nlo\nlol')
+  elif(content == 'noiche'):
+    await send_message(message, 'toit')
+  elif(content == 'josh'):
+    josh_array = ['WRONG.','Josh is most definitely wrong.', 'Not even close Josh.', 'GO CAYTS!!!'];
+    await send_message(message, josh_array[random.randint(0,len(josh_array)-1)])
+  elif(content == 'chad'):
+    chad_array = ['Take it eaysee!','You are taking all of my lyfe...','Are you gonna eat that?','BROOOOO-MANCE!','Josh is wrong.'];
+    await send_message(message, chad_array[random.randint(0,len(chad_array)-1)])
+  elif(content == 'grant'):
+    grant_array = ['Thats a violation!','T-Swiz! (sings song in falsetto)','Punch me in the face!','Josh is wrong.'];
+    await send_message(message, grant_array[random.randint(0,len(grant_array)-1)])
+  elif(content == 'nolan'):
+    nolan_array = ['The greatest genius the world has ever seen.','Immaculately beautiful human being.','Josh is wrong.'];
+    await send_message(message, nolan_array[random.randint(0,len(nolan_array)-1)])
   elif(content.startswith('i\'m ')):
     if(' ' not in message.content[4:]):
-      response_message = 'Hi %s, I\'m Roboto.' % (message.content[4:])
+      response_message = 'Hi %s, I\'m Stacy\'s Mom.' % (message.content[4:])
       await send_message(message, response_message)
 
-TRIGGER_MESSAGES = ['foos?', 'ope', 'oof', 'lol']
+TRIGGER_MESSAGES = ['foos?', 'ope', 'oof', 'lol', 'noiche', 'josh', 'chad', 'grant', 'nolan']
 DAD_TRIGGER = 'I\'m '
 
 def is_triggered(message_content):
