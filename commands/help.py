@@ -14,6 +14,8 @@ async def command(client, message):
   help_message = """**Here are list of available commands:**
   < !help >: *Displays a list of available commands*
   < !clean [amount] >: *Removes all messages from the channel this command was invoked in that were sent by me or that were commands for the me*
+  < !covid >: *Returns world and US covid information
+  < !covid [country] >: *Returns covid information about the specified country.*
   < !define [word] >: *Looks up the definition of the word provided*
   < !downvote @user >: *Downvotes a user and keeps track*
   < !emojify [text] >: *Emojifies the provided text*

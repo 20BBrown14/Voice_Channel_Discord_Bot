@@ -7,7 +7,7 @@ import time
 # local file imports
 import config
 import globals_file
-from commands import help, weather, single_giphy_results_display, harry_potter, define, giphy, ping, clean, Mark, lunch, set_lunch, emojify, friday, vote
+from commands import help, weather, single_giphy_results_display, harry_potter, define, giphy, ping, clean, Mark, lunch, set_lunch, emojify, friday, vote, covid
 from rules import reddit_link, pre_add_reaction, auto_triggered_messages, timecard_reminder, count_audit
 from client_interactions import send_message
 
@@ -50,6 +50,9 @@ async def on_message(message):
 
   elif(auto_triggered_messages.is_triggered(message.content)):
     await auto_triggered_messages.apply(client, message)
+
+  elif(covid.is_triggered(message.content)):
+    await covid.command(client, message)
 
   elif(message.content.lower() == ('!version')):
     await send_message(message, 'Version: %s' % globals_file.version)
