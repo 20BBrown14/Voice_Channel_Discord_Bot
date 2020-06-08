@@ -40,7 +40,7 @@ async def apply(client, message):
     await send_message(message, nolan_array[random.randint(0,len(nolan_array)-1)])
   elif(content.startswith('i\'m ')):
     if(' ' not in message.content[4:]):
-      response_message = 'Hi %s, I\'m Roboto.' % (message.content[4:])
+      response_message = 'Hi %s, I\'m Stacy\'s Mom.' % (message.content[4:])
       await send_message(message, response_message)
 
 TRIGGER_MESSAGES = ['foos?', 'ope', 'oof', 'lol', 'noiche', 'josh', 'chad', 'grant', 'nolan']
