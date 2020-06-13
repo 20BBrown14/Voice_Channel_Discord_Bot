@@ -36,7 +36,7 @@ async def apply(client, message):
     grant_array = ['Thats a violation!','T-Swiz! (sings song in falsetto)','Punch me in the face!','Josh is wrong.'];
     await send_message(message, grant_array[random.randint(0,len(grant_array)-1)])
   elif(content == 'nolan'):
-    nolan_array = ['The greatest genius the world has ever seen.','Immaculately beautiful human being.','Josh is wrong.'];
+    nolan_array = ['Burn Ginger, BURN!!!','The greatest genius the world has ever seen.','Immaculately beautiful human being.','Josh is wrong.'];
     await send_message(message, nolan_array[random.randint(0,len(nolan_array)-1)])
   elif(content.startswith('i\'m ')):
     if(' ' not in message.content[4:]):
