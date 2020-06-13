@@ -64,4 +64,3 @@ count_config = {
 lunch_config = {
   "lunch_time": "11:30"
 }
-#Did I do this right?
