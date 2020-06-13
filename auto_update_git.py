@@ -13,7 +13,7 @@ def kill_bot():
 
 def start_bot():
   global python_bot_subprocess
-  python_bot_subprocess = subprocess.Popen(["python", "python_bot.py"], cwd=os.getcwd())
+  python_bot_subprocess = subprocess.Popen(["python3", "python_bot.py"], cwd=os.getcwd())
   time.sleep(5)
   print("Python bot id: " + str(python_bot_subprocess.pid))
 
@@ -34,6 +34,6 @@ def main():
   start_bot()
   while(1):
     check_for_git_update()
-    time.sleep(60*30)
+    time.sleep(60)
 
 main()
