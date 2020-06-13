@@ -25,7 +25,7 @@ async def apply(client, message):
   elif(content == 'lol'):
     await send_message(message, 'lo\nlo\nlol')
   elif(content == 'noiche'):
-    await send_message(message, 'toit')
+    await send_message(message, 'toit1')
   elif(content == 'josh'):
     josh_array = ['WRONG.','Josh is most definitely wrong.', 'Not even close Josh.', 'GO CAYTS!!!'];
     await send_message(message, josh_array[random.randint(0,len(josh_array)-1)])
