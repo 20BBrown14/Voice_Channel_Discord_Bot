@@ -1,6 +1,10 @@
 import discipline_defs as d
 
-def discipline( name ):
+from client_interactions import delete_message, send_message
+
+async def discipline( clinet, message, name ):
+    await delete_message(message)
+    
     #Open the file, and unpack contents
     f = open( "discipline.txt", "r" )
     data = unpack_file( f )
@@ -10,9 +14,13 @@ def discipline( name ):
 
     #Re-pack the file contents, and write to the file
     f = open( "discipline.txt", "w" )
-    pack_file( f, data )    
+    pack_file( f, data ) 
+    
+    evaluate( client, message, name )
 
-def evaluate( name ):
+async def evaluate( client, message, name ):
+    await delete_message(message)
+    
     #Open the file, and unpack contents
     f = open( "discipline.txt", "r" )
     data = unpack_file( f )
@@ -21,7 +29,7 @@ def evaluate( name ):
     i = locate_offender( name, data )
     report_card = create_report( name, data, i )
 
-    print( report_card )
+    send_message( message, report_card )
     
 def add_demerit( name, data ):
     #Check for repeat offenders
@@ -122,3 +130,8 @@ def decrypt( key, string ):
     decoded_string = "".join( decoded_chars )
     return decoded_string
     
+# String that triggers this command
+TRIGGER = '!discipline'
+
+def is_triggered(message_content):
+  return message_content.lower() == TRIGGER
