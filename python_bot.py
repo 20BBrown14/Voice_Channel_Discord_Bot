@@ -129,7 +129,6 @@ async def on_message(message):
     
   elif(message.content.startswith(discipline.TRIGGER)):
     split_content = message.content.split( ' ' )
-    try:
-        await discipline.command(client, message, split_content[ 1 ])
+    await discipline.command(client, message, split_content[ 1 ])
 
 client.run(discordApiKey)
