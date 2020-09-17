@@ -1,4 +1,8 @@
-import discipline_defs as d
+DEMERIT_CNT         = 3
+CITATION_CNT        = 5
+VILOLATION_CNT      = 4
+VERB_WARNING_CNT    = 3
+WRITTEN_WARNING_CNT = 2
 
 from client_interactions import delete_message, send_message
 
@@ -50,12 +54,12 @@ def create_report( name, data, i ):
         cnt = data[ i ][ 'count' ]
 
         #Calculate sinfulness
-        demerit_cnt = cnt % d.DEMERIT_CNT
-        citation_cnt = ( cnt // d.DEMERIT_CNT ) % d.CITATION_CNT
-        violation_cnt = ( cnt // ( d.DEMERIT_CNT * d.CITATION_CNT ) ) % d.VILOLATION_CNT
-        verb_warning_cnt = ( cnt // ( d.DEMERIT_CNT * d.CITATION_CNT * d.VILOLATION_CNT ) ) % d.VERB_WARNING_CNT
-        written_warning_cnt = ( cnt // ( d.DEMERIT_CNT * d.CITATION_CNT * d.VILOLATION_CNT * d.VERB_WARNING_CNT ) ) % d.WRITTEN_WARNING_CNT
-        disciplinary_review_cnt = cnt // ( d.DEMERIT_CNT * d.CITATION_CNT * d.VILOLATION_CNT * d.VERB_WARNING_CNT * d.WRITTEN_WARNING_CNT )
+        demerit_cnt = cnt % DEMERIT_CNT
+        citation_cnt = ( cnt // DEMERIT_CNT ) % CITATION_CNT
+        violation_cnt = ( cnt // ( DEMERIT_CNT * CITATION_CNT ) ) % VILOLATION_CNT
+        verb_warning_cnt = ( cnt // ( DEMERIT_CNT * CITATION_CNT * VILOLATION_CNT ) ) % VERB_WARNING_CNT
+        written_warning_cnt = ( cnt // ( DEMERIT_CNT * CITATION_CNT * VILOLATION_CNT * VERB_WARNING_CNT ) ) % WRITTEN_WARNING_CNT
+        disciplinary_review_cnt = cnt // ( DEMERIT_CNT * CITATION_CNT * VILOLATION_CNT * VERB_WARNING_CNT * WRITTEN_WARNING_CNT )
 
         #Create an exact report of how depraved you are
         report = "Demerits:" + str( demerit_cnt ) + "\n"
