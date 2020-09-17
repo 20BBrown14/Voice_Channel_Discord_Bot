@@ -7,7 +7,7 @@ import time
 # local file imports
 import config
 import globals_file
-from commands import help, weather, single_giphy_results_display, harry_potter, define, giphy, ping, clean, Mark, lunch, set_lunch, emojify, friday, vote
+from commands import help, weather, single_giphy_results_display, harry_potter, define, giphy, ping, clean, Mark, lunch, set_lunch, emojify, friday, vote, discipline
 from rules import reddit_link, pre_add_reaction, auto_triggered_messages, timecard_reminder, count_audit
 from client_interactions import send_message
 
