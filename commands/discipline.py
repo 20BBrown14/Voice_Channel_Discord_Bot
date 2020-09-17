@@ -20,18 +20,26 @@ ex: !discipline josh
 async def command( client, message, name ):
     await delete_message(message)
     
+    send_message( message, "Message Deleted" )
+    
     #Open the file, and unpack contents
     f = open( "discipline.txt", "r" )
+    send_message( message, "File Opened" )
     data = unpack_file( f )
+    send_message( message, "File Unpacked" )
 
     #Discipline the delinquent individual
     add_demerit( name, data )
+    send_message( message, "Demerit Added" )
 
     #Re-pack the file contents, and write to the file
     f = open( "discipline.txt", "w" )
+    send_message( message, "File Opened for writing" )
     pack_file( f, data ) 
+    send_message( message, "File Packed and written" )
     
     evaluate( client, message, name )
+    send_message( message, "Evaluation complete" )
 
 async def evaluate( client, message, name ):
     await delete_message(message)
