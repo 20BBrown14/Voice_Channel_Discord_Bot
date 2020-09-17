@@ -1,12 +1,23 @@
+from client_interactions import delete_message, send_message
+
 DEMERIT_CNT         = 3
 CITATION_CNT        = 5
 VILOLATION_CNT      = 4
 VERB_WARNING_CNT    = 3
 WRITTEN_WARNING_CNT = 2
 
-from client_interactions import delete_message, send_message
-
-async def discipline( client, message, name ):
+"""
+Discipline command
+Severely punishes the non elect
+ex: !discipline josh
+@param client: The discord client, generally assumed to be the bot user itself
+@param message: The message the discord bot is responding to
+@param name: Individual being shamed
+@result: Deletes messages always
+@result: Punishes always
+@result: Gives report card always
+"""
+async def command( client, message, name ):
     await delete_message(message)
     
     #Open the file, and unpack contents
@@ -22,7 +33,7 @@ async def discipline( client, message, name ):
     
     evaluate( client, message, name )
 
-async def evaluate( client, message, name ):
+def evaluate( client, message, name ):
     await delete_message(message)
     
     #Open the file, and unpack contents
