@@ -23,7 +23,7 @@ async def command( client, message, name ):
     send_message( message, "Message Deleted" )
     
     #Open the file, and unpack contents
-    f = open( "discipline.txt", "r" )
+    f = open( "discipline.txt", "w" )
     send_message( message, "File Opened" )
     data = unpack_file( f )
     send_message( message, "File Unpacked" )
