@@ -33,7 +33,7 @@ async def command( client, message, name ):
     
     evaluate( client, message, name )
 
-def evaluate( client, message, name ):
+async def evaluate( client, message, name ):
     await delete_message(message)
     
     #Open the file, and unpack contents
