@@ -2,7 +2,7 @@ import discipline_defs as d
 
 from client_interactions import delete_message, send_message
 
-async def discipline( clinet, message, name ):
+async def discipline( client, message, name ):
     await delete_message(message)
     
     #Open the file, and unpack contents
