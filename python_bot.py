@@ -42,8 +42,8 @@ async def on_message(message):
 
   await pre_add_reaction.apply(client, message)
 
-  if(message.author != client.user and message.channel.name and globals_file.timecard_reminder_config):
-    await timecard_reminder.apply(client, message)
+  # if(message.author != client.user and message.channel.name and globals_file.timecard_reminder_config):
+    # await timecard_reminder.apply(client, message)
 
   if(globals_file.count_config and count_audit.is_triggered(message)):
     await count_audit.apply(client, message)
