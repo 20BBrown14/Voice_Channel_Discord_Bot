@@ -13,7 +13,6 @@ Sends a response message based on the message contents.
 
 async def apply(client, message):
   content = message.content.lower()
-  print(content)
   if(content == 'foos?'):
     foos_response_array = ['when?', 'omw', 'Oh, so that\'s why you never have your stuff done.']
     await send_message(message, foos_response_array[random.randint(0,len(foos_response_array)-1)])
