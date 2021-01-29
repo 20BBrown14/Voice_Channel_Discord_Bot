@@ -1,6 +1,6 @@
 import random
 
-from client_interactions import send_message
+from client_interactions import send_message, add_reaction, get_emoji
 
 """
 Auto triggerd messages without explicit consent of the user
@@ -13,6 +13,7 @@ Sends a response message based on the message contents.
 
 async def apply(client, message):
   content = message.content.lower()
+  print(content)
   if(content == 'foos?'):
     foos_response_array = ['when?', 'omw', 'Oh, so that\'s why you never have your stuff done.']
     await send_message(message, foos_response_array[random.randint(0,len(foos_response_array)-1)])
@@ -28,10 +29,33 @@ async def apply(client, message):
     if(' ' not in message.content[4:]):
       response_message = 'Hi %s, I\'m Roboto.' % (message.content[4:])
       await send_message(message, response_message)
+  
+  if('gme' in content):
+    await add_reaction(client, message, "🚀")
+    await add_reaction(client, message, "📈")
+    await add_reaction(client, message, "🌙")
+  if('diamond hand' in content):
+    await add_reaction(client, message, "💎")
+    await add_reaction(client, message, "🤲")
+  if('short' in content):
+    await add_reaction(client, message, "📉")
+    await add_reaction(client, message, "🧻")
+    await add_reaction(client, message, "🤲")
+  if('paper hand' in content):
+    await add_reaction(client, message, "🧻")
+    await add_reaction(client, message, "🤲")
 
 TRIGGER_MESSAGES = ['foos?', 'ope', 'oof', 'lol']
+ANYWHERE_TRIGGER_MESSAGES = ['gme', 'diamond hand', 'short', 'paper hand']
 DAD_TRIGGER = 'I\'m '
 
 def is_triggered(message_content):
   # determine if this command will be triggered
-  return message_content.lower() in TRIGGER_MESSAGES or message_content.startswith(DAD_TRIGGER)
+  lowercase_content = message_content.lower()
+  is_any_triggered = False
+
+  for any_message in ANYWHERE_TRIGGER_MESSAGES:
+    if any_message in lowercase_content:
+      is_any_triggered = True
+  
+  return lowercase_content in TRIGGER_MESSAGES or message_content.startswith(DAD_TRIGGER) or is_any_triggered
