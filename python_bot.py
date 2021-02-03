@@ -7,7 +7,7 @@ import time
 # local file imports
 import config
 import globals_file
-from commands import help, weather, single_giphy_results_display, harry_potter, define, giphy, ping, clean, Mark, lunch, set_lunch, emojify, friday, vote, covid
+from commands import help, weather, single_giphy_results_display, harry_potter, define, giphy, ping, clean, Mark, lunch, set_lunch, emojify, friday, vote, covid, stonks
 from rules import reddit_link, pre_add_reaction, auto_triggered_messages, timecard_reminder, count_audit
 from client_interactions import send_message
 
@@ -48,10 +48,10 @@ async def on_message(message):
   if(globals_file.count_config and count_audit.is_triggered(message)):
     await count_audit.apply(client, message)
 
-  elif(auto_triggered_messages.is_triggered(message.content)):
+  if(auto_triggered_messages.is_triggered(message.content)):
     await auto_triggered_messages.apply(client, message)
 
-  elif(covid.is_triggered(message.content)):
+  if(covid.is_triggered(message.content)):
     await covid.command(client, message)
 
   elif(message.content.lower() == ('!version')):
@@ -110,6 +110,9 @@ async def on_message(message):
 
   elif(config.weather_api_key and message.content.lower().startswith(weather.TRIGGER)):
     await weather.command(client, message, weather_api_key)
+
+  elif(config.finnhub_api_key and stonks.is_triggered(message.content)):
+    await stonks.command(client, message)
 
   elif(message.content.lower().startswith(harry_potter.TRIGGER_PAUSE)):
     await send_message(message, 'This command is currently unavailable')

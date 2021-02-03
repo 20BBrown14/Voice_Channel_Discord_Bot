@@ -64,3 +64,5 @@ count_config = {
 lunch_config = {
   "lunch_time": "11:30"
 }
+
+finnhub_api_key = "abcdefghijklmnopqrstuvwxyz"

@@ -1,6 +1,7 @@
 #globals.py
 import json
 from datetime import datetime
+import finnhub
 
 id_mark    = 547509875308232745
 
@@ -14,6 +15,7 @@ global logs_config
 global game_played_config
 global mention_reactions_config
 global count_config
+global finnhub_client
 
 def init(client, config):
   # Update for each revision using format yyyy-mm-dd_#
@@ -85,4 +87,7 @@ def init(client, config):
             count_config['count_channel'] = channel
     else:
       count_config = None
+
+    global finnhub_client
+    finnhub_client = finnhub.Client(api_key=config.finnhub_api_key)
     
