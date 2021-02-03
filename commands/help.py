@@ -28,6 +28,7 @@ async def command(client, message):
   < !setlunch >: *Sets the lunch time for the !lunch command*
   < !singleresults ['count']>: *Lists the single result searches from slash command*
   < !status >: *Replys indicating I am online*
+  < !stonks [SYMBOL] >: *Gives info regarding the stock price* 
   < !upvote @user >: *Upvotes a user and keeps track*
   < !votes >: *Displays all votes from upvote and downvote commands.*
   < !weather [forecast] [zip=#####] >: *Looks up and displays weather for the given zipcode*
