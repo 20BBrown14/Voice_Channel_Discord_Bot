@@ -65,4 +65,11 @@ lunch_config = {
   "lunch_time": "11:30"
 }
 
+turn_on_pc_config = {
+  "allowed_servers": [123, 456],
+  "allowed_channels": [123, 456],
+  "allowed_users": [123, 456],
+  "mac_to_wake": "FF:FF:FF:FF:FF"
+}
+
 finnhub_api_key = "abcdefghijklmnopqrstuvwxyz"

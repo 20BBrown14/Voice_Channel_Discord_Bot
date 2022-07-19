@@ -8,7 +8,7 @@ import time
 import config
 import globals_file
 from commands import help, weather, single_giphy_results_display, harry_potter, define, giphy, ping, clean, Mark, lunch, set_lunch, emojify, friday, vote, covid, stonks
-from rules import reddit_link, pre_add_reaction, auto_triggered_messages, timecard_reminder, count_audit
+from rules import turn_on_pc, reddit_link, pre_add_reaction, auto_triggered_messages, timecard_reminder, count_audit
 from client_interactions import send_message
 
 #from config.py file
@@ -39,6 +39,9 @@ async def on_message(message):
   if(message.author != client.user and message.channel.name and globals_file.logs_config and message.channel.id not in globals_file.logs_config['ignored_channels']):
     message_string = (message.author.name + " said : \"" + message.clean_content + "\" in #" + message.channel.name + " @ " + time.ctime())
     await globals_file.logs_config['logs_channel'].send(message_string)
+
+  if(turn_on_pc.is_triggered(message)):
+     await turn_on_pc.apply(client, message)
 
   await pre_add_reaction.apply(client, message)
 

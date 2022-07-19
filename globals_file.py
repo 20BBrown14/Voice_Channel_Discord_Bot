@@ -13,6 +13,7 @@ global timecard_reminder_config
 global weather_cache
 global logs_config
 global game_played_config
+global turn_on_pc_config
 global mention_reactions_config
 global count_config
 global finnhub_client
@@ -90,4 +91,7 @@ def init(client, config):
 
     global finnhub_client
     finnhub_client = finnhub.Client(api_key=config.finnhub_api_key)
-    
+
+    global turn_on_pc_config
+    if(config.turn_on_pc_config):
+      turn_on_pc_config = config.turn_on_pc_config
